@@ -12,6 +12,7 @@ import Dashboard from 'src/dashboards/components/Dashboard'
 import ManualRefresh from 'src/shared/components/ManualRefresh'
 import TemplateControlBar from 'src/tempVars/components/TemplateControlBar'
 import AnnotationControlBar from 'src/shared/components/AnnotationControlBar'
+import AnnotationEditorContainer from 'src/shared/components/AnnotationEditorContainer'
 
 // Actions
 import * as dashboardActions from 'src/dashboards/actions'
@@ -325,6 +326,7 @@ class DashboardPage extends Component<Props, State> {
             onSummonOverlayTechnologies={handleShowCellEditorOverlay}
           />
         ) : null}
+        <AnnotationEditorContainer />
       </div>
     )
   }
