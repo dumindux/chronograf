@@ -5,23 +5,28 @@ import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
 import OverlayBody from 'src/reusable_ui/components/overlays/OverlayBody'
 import AnnotationEditorForm from 'src/shared/components/AnnotationEditorForm'
 
-import {Annotation} from 'src/types'
+import {Annotation, RemoteDataState} from 'src/types'
 
 interface Props {
   annotation: Annotation
   onCancel: () => void
+  onSave: (annotation: Annotation) => Promise<void>
   onDelete: () => Promise<void>
 }
 
 interface State {
   draftAnnotation: Annotation | null
+  savingStatus: RemoteDataState
 }
 
 class AnnotationEditor extends PureComponent<Props, State> {
   constructor(props) {
     super(props)
 
-    this.state = {draftAnnotation: null}
+    this.state = {
+      draftAnnotation: null,
+      savingStatus: RemoteDataState.NotStarted,
+    }
   }
 
   public render() {
@@ -37,9 +42,10 @@ class AnnotationEditor extends PureComponent<Props, State> {
               </button>
               <button
                 className="btn btn-sm btn-success"
-                disabled={!this.canSave}
+                disabled={!this.canSave || this.isSaving}
+                onClick={this.handleSave}
               >
-                Save
+                {this.isSaving ? 'Saving...' : 'Save'}
               </button>
             </div>
           </OverlayHeading>
@@ -60,10 +66,27 @@ class AnnotationEditor extends PureComponent<Props, State> {
     return !!this.state.draftAnnotation
   }
 
+  private get isSaving(): boolean {
+    return this.state.savingStatus === RemoteDataState.Loading
+  }
+
   private handleSetDraftAnnotation = (
     draftAnnotation: Annotation | null
   ): void => {
     this.setState({draftAnnotation})
+  }
+
+  private handleSave = async (): Promise<void> => {
+    if (!this.canSave) {
+      return
+    }
+
+    const {onSave} = this.props
+    const {draftAnnotation} = this.state
+
+    this.setState({savingStatus: RemoteDataState.Loading})
+
+    await onSave(draftAnnotation)
   }
 }
 

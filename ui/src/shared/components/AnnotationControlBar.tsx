@@ -2,12 +2,12 @@ import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
 import AnnotationEditor from 'src/shared/components/AnnotationEditor'
-import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 
 import {ADDING} from 'src/shared/annotations/helpers'
 
 import {
   setEditingAnnotation,
+  updateAnnotationAsync,
   deleteAnnotationAsync,
   addingAnnotation,
   dismissAddingAnnotation,
@@ -22,6 +22,7 @@ interface Props {
   onDismissAddingAnnotation: typeof dismissAddingAnnotation
   onSetEditingAnnotation: typeof setEditingAnnotation
   onDeleteAnnotation: typeof deleteAnnotationAsync
+  onSaveAnnotation: typeof updateAnnotationAsync
 }
 
 class AnnotationControlBar extends PureComponent<Props> {
@@ -42,6 +43,7 @@ class AnnotationControlBar extends PureComponent<Props> {
               <AnnotationEditor
                 annotation={editingAnnotation}
                 onCancel={this.handleCancelEdits}
+                onSave={this.handleSave}
                 onDelete={this.handleDelete}
               />
             </div>
@@ -101,6 +103,16 @@ class AnnotationControlBar extends PureComponent<Props> {
     return
   }
 
+  private handleSave = async (a: Annotation): Promise<void> => {
+    const {onSaveAnnotation, onSetEditingAnnotation} = this.props
+
+    await onSaveAnnotation(a)
+
+    onSetEditingAnnotation(null)
+
+    return
+  }
+
   private handleToggleAddingAnnotation = (): void => {
     const {
       isAddingAnnotation,
@@ -124,6 +136,7 @@ const mstp = ({annotations: {annotations, mode, editingAnnotation}}) => {
 }
 
 const mdtp = {
+  onSaveAnnotation: updateAnnotationAsync,
   onAddingAnnotation: addingAnnotation,
   onDismissAddingAnnotation: dismissAddingAnnotation,
   onSetEditingAnnotation: setEditingAnnotation,
