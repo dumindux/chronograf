@@ -3,6 +3,7 @@ export interface Annotation {
   startTime: number
   endTime: number
   text: string
+  labels?: string[]
   links: {self: string}
 }
 

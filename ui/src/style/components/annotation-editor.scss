@@ -9,3 +9,21 @@
     margin-right: 5px;
   }
 }
+
+.annotation-editor .radio-buttons {
+  width: 100%;
+}
+
+.annotation-editor-body--delete {
+  width: 65px;
+  margin: 15px auto 0 auto;
+}
+
+.annotation-editor-body label {
+  display: flex;
+  justify-content: space-between;
+
+  .error {
+    color: $c-curacao;
+  }
+}
