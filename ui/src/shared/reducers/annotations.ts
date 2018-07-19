@@ -1,7 +1,7 @@
 import {ADDING, EDITING, TEMP_ANNOTATION} from 'src/shared/annotations/helpers'
 
 import {Action} from 'src/types/actions/annotations'
-import {Annotation} from 'src/types'
+import {Annotation, RemoteDataState} from 'src/types'
 
 export interface AnnotationState {
   mode: string
@@ -10,6 +10,11 @@ export interface AnnotationState {
     [annotationId: string]: Annotation
   }
   editingAnnotation: string | null
+  allLabels: string[]
+  allLabelsStatus: RemoteDataState
+  selectedLabels: {
+    [dashboardId: number]: string[]
+  }
 }
 
 const initialState = {
@@ -17,6 +22,9 @@ const initialState = {
   isTempHovering: false,
   annotations: {},
   editingAnnotation: null,
+  allLabels: [],
+  allLabelsStatus: RemoteDataState.NotStarted,
+  selectedLabels: {},
 }
 
 const annotationsReducer = (
@@ -142,6 +150,35 @@ const annotationsReducer = (
         ...state,
         editingAnnotation: action.payload,
       }
+    }
+
+    case 'TOGGLE_LABEL': {
+      const {label, dashboardId} = action.payload
+      const labels = new Set(state.selectedLabels[dashboardId])
+
+      if (labels.has(label)) {
+        labels.delete(label)
+      } else {
+        labels.add(label)
+      }
+
+      return {
+        ...state,
+        selectedLabels: {
+          ...state.selectedLabels,
+          [dashboardId]: [...labels],
+        },
+      }
+    }
+
+    case 'SET_ANNOTATION_LABELS_STATUS': {
+      return {...state, allLabelsStatus: action.payload}
+    }
+
+    case 'LOAD_ANNOTATION_LABELS': {
+      const allLabels = action.payload
+
+      return {...state, allLabels}
     }
   }
 

@@ -1,5 +1,7 @@
 import {Dispatch} from 'redux'
+
 import * as AnnotationData from 'src/types/annotations'
+import {RemoteDataState} from 'src/types'
 
 export type Action =
   | EditingAnnotationAction
@@ -14,6 +16,9 @@ export type Action =
   | DeleteAnnotationAction
   | AddAnnotationAction
   | SetEditingAnnotationAction
+  | ToggleLabelAction
+  | SetAnnotationLabelsStatusAction
+  | LoadAnnotationLabelsAction
 
 export interface EditingAnnotationAction {
   type: 'EDITING_ANNOTATION'
@@ -76,6 +81,24 @@ export interface AddAnnotationAction {
 export interface SetEditingAnnotationAction {
   type: 'SET_EDITING_ANNOTATION'
   payload: string | null
+}
+
+export interface ToggleLabelAction {
+  type: 'TOGGLE_LABEL'
+  payload: {
+    label: string
+    dashboardId: number
+  }
+}
+
+export interface SetAnnotationLabelsStatusAction {
+  type: 'SET_ANNOTATION_LABELS_STATUS'
+  payload: RemoteDataState
+}
+
+export interface LoadAnnotationLabelsAction {
+  type: 'LOAD_ANNOTATION_LABELS'
+  payload: string[]
 }
 
 export type GetAnnotationsDispatcher = (

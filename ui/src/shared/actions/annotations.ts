@@ -1,8 +1,11 @@
 import * as api from 'src/shared/apis/annotation'
 import {Dispatch} from 'redux'
+
+import {getAnnotations} from 'src/shared/apis/annotation'
+
 import * as AnnotationsActions from 'src/types/actions/annotations'
 import * as AnnotationsModels from 'src/types/annotations'
-import {getAnnotations} from 'src/shared/apis/annotation'
+import {RemoteDataState} from 'src/types'
 
 export const editingAnnotation = (): AnnotationsActions.EditingAnnotationAction => ({
   type: 'EDITING_ANNOTATION',
@@ -75,6 +78,28 @@ export const setEditingAnnotation = (
   payload: id,
 })
 
+export const toggleLabel = (
+  label: string,
+  dashboardId: number
+): AnnotationsActions.ToggleLabelAction => ({
+  type: 'TOGGLE_LABEL',
+  payload: {label, dashboardId},
+})
+
+export const setAnnotationLabelsStatus = (
+  status: RemoteDataState
+): AnnotationsActions.SetAnnotationLabelsStatusAction => ({
+  type: 'SET_ANNOTATION_LABELS_STATUS',
+  payload: status,
+})
+
+export const loadAnnotationLabels = (
+  labels: string[]
+): AnnotationsActions.LoadAnnotationLabelsAction => ({
+  type: 'LOAD_ANNOTATION_LABELS',
+  payload: labels,
+})
+
 export const addAnnotationAsync = (
   createUrl: string,
   annotation: AnnotationsModels.Annotation
@@ -108,4 +133,17 @@ export const updateAnnotationAsync = (
 ) => async dispatch => {
   await api.updateAnnotation(annotation)
   dispatch(updateAnnotation(annotation))
+}
+
+const delay = ms => new Promise(res => setTimeout(res, ms))
+
+const FAKE_ANNOTATION_LABELS = ['bam', 'slam', 'wham', 'jam', 'yam']
+
+export const getAnnotationLabelsAsync = () => async dispatch => {
+  dispatch(setAnnotationLabelsStatus(RemoteDataState.Loading))
+
+  await delay(1000)
+
+  dispatch(loadAnnotationLabels(FAKE_ANNOTATION_LABELS))
+  dispatch(setAnnotationLabelsStatus(RemoteDataState.Done))
 }

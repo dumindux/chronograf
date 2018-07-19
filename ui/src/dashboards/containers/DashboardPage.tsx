@@ -304,7 +304,7 @@ class DashboardPage extends Component<Props, State> {
                 onPickTemplate={this.handlePickTemplate}
                 source={source}
               />
-              <AnnotationControlBar />
+              <AnnotationControlBar dashboardId={dashboardID} />
             </>
           )}
         {dashboard ? (

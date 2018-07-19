@@ -6,11 +6,41 @@
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid $g2-kevlar;
-}
-
-.annotation-control-bar--empty {
   color: $g11-sidewalk;
   font-size: 14px;
   font-weight: 500;
+  @include no-user-select();
+}
+
+.annotation-control-bar--lhs {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.annotation-control-bar--label {
+  margin-right: 5px;
+  background-color: $g2-kevlar;
+  padding: 12px 15px;
+  border-radius: 4px;
+  color: $g12-forge;
+  text-shadow: none;
+  border-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+
+  &:hover, &.selected {
+    background-color: $g6-smoke;
+    color: $g16-pearl;
+    cursor: pointer;
+  }
+}
+
+.toolbar-title {
+  display: block;
+  margin-right: 15px;
+  color: $g11-sidewalk;
+  font-size: 14px;
+  font-weight: bold;
   @include no-user-select();
 }

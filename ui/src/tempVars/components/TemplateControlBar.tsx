@@ -56,7 +56,7 @@ class TemplateControlBar extends Component<Props, State> {
               onClick={this.handleAddVariable}
             >
               <span className="icon plus" />
-              Add Variable
+              Add Template Variable
             </button>
           </Authorized>
         </div>
