@@ -36,13 +36,18 @@ class AnnotationControlBar extends PureComponent<Props> {
         <div className="annotation-control-bar--rhs">
           {this.renderToggleButton()}
         </div>
-        <OverlayTechnology visible={!!editingAnnotation}>
-          <AnnotationEditor
-            annotation={editingAnnotation}
-            onCancel={this.handleCancelEdits}
-            onDelete={this.handleDelete}
-          />
-        </OverlayTechnology>
+        {editingAnnotation && (
+          <div className="overlay-tech show">
+            <div className="overlay--dialog" data-test="overlay-children">
+              <AnnotationEditor
+                annotation={editingAnnotation}
+                onCancel={this.handleCancelEdits}
+                onDelete={this.handleDelete}
+              />
+            </div>
+            <div className="overlay--mask" />
+          </div>
+        )}
       </div>
     )
   }

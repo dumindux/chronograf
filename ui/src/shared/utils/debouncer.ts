@@ -24,7 +24,9 @@ class Debouncer {
   }
 
   public cancelAll() {
-    for (const timer of this.timers) {
+    const timers: number[] = Object.values(this.timers)
+
+    for (const timer of timers) {
       clearTimeout(timer)
     }
   }
