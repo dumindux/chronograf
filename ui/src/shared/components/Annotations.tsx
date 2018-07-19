@@ -10,7 +10,6 @@ import {ADDING, TEMP_ANNOTATION} from 'src/shared/annotations/helpers'
 import {
   updateAnnotation,
   addingAnnotationSuccess,
-  dismissAddingAnnotation,
   mouseEnterTempAnnotation,
   mouseLeaveTempAnnotation,
 } from 'src/shared/actions/annotations'
@@ -30,7 +29,6 @@ interface Props {
   dygraph: DygraphClass
   isTempHovering: boolean
   handleUpdateAnnotation: (annotation: Annotation) => UpdateAnnotationAction
-  handleDismissAddingAnnotation: () => void
   handleAddingAnnotationSuccess: () => void
   handleMouseEnterTempAnnotation: () => void
   handleMouseLeaveTempAnnotation: () => void
@@ -46,7 +44,6 @@ class Annotations extends Component<Props> {
       xAxisRange,
       isTempHovering,
       handleUpdateAnnotation,
-      handleDismissAddingAnnotation,
       handleAddingAnnotationSuccess,
       handleMouseEnterTempAnnotation,
       handleMouseLeaveTempAnnotation,
@@ -65,7 +62,6 @@ class Annotations extends Component<Props> {
                   tempAnnotation={this.tempAnnotation}
                   staticLegendHeight={staticLegendHeight}
                   onUpdateAnnotation={handleUpdateAnnotation}
-                  onDismissAddingAnnotation={handleDismissAddingAnnotation}
                   onAddingAnnotationSuccess={handleAddingAnnotationSuccess}
                   onMouseEnterTempAnnotation={handleMouseEnterTempAnnotation}
                   onMouseLeaveTempAnnotation={handleMouseLeaveTempAnnotation}
@@ -113,7 +109,6 @@ const mstp = ({
 
 const mdtp = {
   handleAddingAnnotationSuccess: addingAnnotationSuccess,
-  handleDismissAddingAnnotation: dismissAddingAnnotation,
   handleMouseEnterTempAnnotation: mouseEnterTempAnnotation,
   handleMouseLeaveTempAnnotation: mouseLeaveTempAnnotation,
   handleUpdateAnnotation: updateAnnotation,

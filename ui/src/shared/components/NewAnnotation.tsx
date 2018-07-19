@@ -3,7 +3,6 @@ import classnames from 'classnames'
 import {connect} from 'react-redux'
 import uuid from 'uuid'
 
-import OnClickOutside from 'src/shared/components/OnClickOutside'
 import AnnotationWindow from 'src/shared/components/AnnotationWindow'
 import * as actions from 'src/shared/actions/annotations'
 
@@ -17,7 +16,6 @@ interface Props {
   isTempHovering: boolean
   tempAnnotation: Annotation
   addAnnotationAsync: (url: string, a: Annotation) => void
-  onDismissAddingAnnotation: () => void
   onAddingAnnotationSuccess: () => void
   onUpdateAnnotation: (a: Annotation) => void
   onMouseEnterTempAnnotation: () => void
@@ -110,13 +108,6 @@ class NewAnnotation extends Component<Props, State> {
         </div>
       </div>
     )
-  }
-
-  public handleClickOutside = () => {
-    const {onDismissAddingAnnotation, isTempHovering} = this.props
-    if (!isTempHovering) {
-      onDismissAddingAnnotation()
-    }
   }
 
   private clampWithinGraphTimerange = (timestamp: number): number => {
@@ -216,4 +207,4 @@ const mdtp = {
   addAnnotationAsync: actions.addAnnotationAsync,
 }
 
-export default connect(null, mdtp)(OnClickOutside(NewAnnotation))
+export default connect(null, mdtp)(NewAnnotation)
