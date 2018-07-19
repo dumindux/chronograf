@@ -5,16 +5,16 @@ import AnnotationEditor from 'src/shared/components/AnnotationEditor'
 import OverlayTechnology from 'src/reusable_ui/components/overlays/OverlayTechnology'
 
 import {
-  setEditingAnnotation as setEditingAnnotation_,
-  deleteAnnotation as deleteAnnotation_,
+  setEditingAnnotation,
+  deleteAnnotationAsync,
 } from 'src/shared/actions/annotations'
 
 import {Annotation} from 'src/types'
 
 interface Props {
   editingAnnotation?: Annotation
-  setEditingAnnotation: typeof setEditingAnnotation_
-  deleteAnnotationAsync: typeof deleteAnnotation_
+  onSetEditingAnnotation: typeof setEditingAnnotation
+  onDeleteAnnotation: typeof deleteAnnotationAsync
 }
 
 class AnnotationControlBar extends PureComponent<Props> {
@@ -53,15 +53,15 @@ class AnnotationControlBar extends PureComponent<Props> {
   }
 
   private handleCancelEdits = (): void => {
-    const {setEditingAnnotation} = this.props
+    const {onSetEditingAnnotation} = this.props
 
-    setEditingAnnotation(null)
+    onSetEditingAnnotation(null)
   }
 
   private handleDelete = async (): Promise<void> => {
-    const {editingAnnotation, deleteAnnotationAsync} = this.props
+    const {editingAnnotation, onDeleteAnnotation} = this.props
 
-    await deleteAnnotationAsync(editingAnnotation)
+    await onDeleteAnnotation(editingAnnotation)
 
     return
   }
@@ -74,8 +74,8 @@ const mstp = ({annotations: {annotations, editingAnnotation}}) => {
 }
 
 const mdtp = {
-  setEditingAnnotation: setEditingAnnotation_,
-  deleteAnnotationAsync: deleteAnnotation_,
+  onSetEditingAnnotation: setEditingAnnotation,
+  onDeleteAnnotation: deleteAnnotationAsync,
 }
 
 export default connect(mstp, mdtp)(AnnotationControlBar)

@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import moment from 'moment'
 import classnames from 'classnames'
 
-import {setEditingAnnotation as setEditingAnnotation_} from 'src/shared/actions/annotations'
+import {setEditingAnnotation} from 'src/shared/actions/annotations'
 
 import {Annotation} from 'src/types'
 
@@ -27,7 +27,7 @@ interface Props {
   timestamp: number
   onMouseLeave: (e: MouseEvent<HTMLDivElement>) => void
   annotationState: AnnotationState
-  setEditingAnnotation: typeof setEditingAnnotation_
+  onSetEditingAnnotation: typeof setEditingAnnotation
 }
 
 const AnnotationTooltip: SFC<Props> = props => {
@@ -36,14 +36,14 @@ const AnnotationTooltip: SFC<Props> = props => {
     onMouseLeave,
     timestamp,
     annotationState: {isDragging, isMouseOver},
-    setEditingAnnotation,
+    onSetEditingAnnotation,
   } = props
 
   const tooltipClass = classnames('annotation-tooltip', {
     hidden: !(isDragging || isMouseOver),
   })
 
-  const setEditing = () => setEditingAnnotation(annotation.id)
+  const setEditing = () => onSetEditingAnnotation(annotation.id)
 
   return (
     <div
@@ -70,7 +70,7 @@ const AnnotationTooltip: SFC<Props> = props => {
 }
 
 const mdtp = {
-  setEditingAnnotation: setEditingAnnotation_,
+  onSetEditingAnnotation: setEditingAnnotation,
 }
 
 export default connect(null, mdtp)(AnnotationTooltip)
