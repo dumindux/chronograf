@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
+import {withRouter} from 'react-router'
 
 import AnnotationComponent from 'src/shared/components/Annotation'
 import NewAnnotation from 'src/shared/components/NewAnnotation'
@@ -18,7 +19,6 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {Annotation, DygraphClass, Source} from 'src/types'
 import {UpdateAnnotationAction} from 'src/types/actions/annotations'
-import {AnnotationState} from 'src/shared/reducers/annotations'
 
 interface Props {
   dWidth: number
@@ -97,15 +97,27 @@ class Annotations extends Component<Props> {
   }
 }
 
-const mstp = ({
-  annotations: {annotations, mode, isTempHovering},
-}: {
-  annotations: AnnotationState
-}) => ({
-  annotations: Object.values(annotations).filter(a => !!a),
-  mode: mode || 'NORMAL',
-  isTempHovering,
-})
+const mstp = (state, ownProps) => {
+  const {annotations, mode, isTempHovering, selectedLabels} = state.annotations
+  const dashboardID = ownProps.params.dashboardID
+  const labels = selectedLabels[dashboardID] || []
+
+  let selectedAnnotations = Object.values<Annotation>(annotations).filter(
+    a => !!a
+  )
+
+  if (labels.length) {
+    selectedAnnotations = selectedAnnotations.filter(a =>
+      labels.every(v => !!a.labels && a.labels.includes(v))
+    )
+  }
+
+  return {
+    annotations: selectedAnnotations,
+    mode: mode || 'NORMAL',
+    isTempHovering,
+  }
+}
 
 const mdtp = {
   handleAddingAnnotationSuccess: addingAnnotationSuccess,
@@ -114,4 +126,4 @@ const mdtp = {
   handleUpdateAnnotation: updateAnnotation,
 }
 
-export default connect(mstp, mdtp)(Annotations)
+export default withRouter(connect(mstp, mdtp)(Annotations))
