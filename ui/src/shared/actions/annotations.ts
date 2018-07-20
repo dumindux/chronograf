@@ -106,8 +106,8 @@ export const addAnnotationAsync = (
 ) => async dispatch => {
   dispatch(addAnnotation(annotation))
   const savedAnnotation = await api.createAnnotation(createUrl, annotation)
-  dispatch(addAnnotation(savedAnnotation))
   dispatch(deleteAnnotation(annotation))
+  dispatch(addAnnotation(savedAnnotation))
 }
 
 export const getAnnotationsAsync: AnnotationsActions.GetAnnotationsDispatcher = (

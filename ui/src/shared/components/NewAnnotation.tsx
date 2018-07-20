@@ -1,4 +1,5 @@
 import React, {Component, MouseEvent} from 'react'
+import {withRouter, WithRouterProps} from 'react-router'
 import classnames from 'classnames'
 import {connect} from 'react-redux'
 import uuid from 'uuid'
@@ -14,6 +15,7 @@ interface Props {
   dygraph: DygraphClass
   source: Source
   isTempHovering: boolean
+  selectedLabels: string[]
   tempAnnotation: Annotation
   addAnnotationAsync: (url: string, a: Annotation) => void
   onAddingAnnotationSuccess: () => void
@@ -28,9 +30,9 @@ interface State {
 }
 
 @ErrorHandling
-class NewAnnotation extends Component<Props, State> {
+class NewAnnotation extends Component<Props & WithRouterProps, State> {
   public wrapperRef: React.RefObject<HTMLDivElement>
-  constructor(props: Props) {
+  constructor(props) {
     super(props)
     this.wrapperRef = React.createRef<HTMLDivElement>()
     this.state = {
@@ -155,6 +157,7 @@ class NewAnnotation extends Component<Props, State> {
   private handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
     const {
       tempAnnotation,
+      selectedLabels,
       onUpdateAnnotation,
       addAnnotationAsync,
       onAddingAnnotationSuccess,
@@ -166,7 +169,12 @@ class NewAnnotation extends Component<Props, State> {
     const upTime = this.eventToTimestamp(e)
     const downTime = tempAnnotation.startTime
     const [startTime, endTime] = [downTime, upTime].sort()
-    const newAnnotation = {...tempAnnotation, startTime, endTime}
+    const newAnnotation = {
+      ...tempAnnotation,
+      startTime,
+      endTime,
+      labels: selectedLabels,
+    }
 
     onUpdateAnnotation(newAnnotation)
     addAnnotationAsync(createUrl, {...newAnnotation, id: uuid.v4()})
@@ -203,8 +211,12 @@ class NewAnnotation extends Component<Props, State> {
   }
 }
 
+const mstp = ({annotations: {selectedLabels}}, {params: {dashboardID}}) => {
+  return {selectedLabels: selectedLabels[+dashboardID] || []}
+}
+
 const mdtp = {
   addAnnotationAsync: actions.addAnnotationAsync,
 }
 
-export default connect(null, mdtp)(NewAnnotation)
+export default withRouter(connect(mstp, mdtp)(NewAnnotation))
