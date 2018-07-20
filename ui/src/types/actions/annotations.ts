@@ -13,6 +13,7 @@ export type Action =
   | MouseLeaveTempAnnotationAction
   | LoadAnnotationsAction
   | UpdateAnnotationAction
+  | SetAddingAnnotationAction
   | DeleteAnnotationAction
   | AddAnnotationAction
   | SetEditingAnnotationAction
@@ -62,6 +63,11 @@ export interface UpdateAnnotationAction {
   payload: {
     annotation: AnnotationData.Annotation
   }
+}
+
+export interface SetAddingAnnotationAction {
+  type: 'SET_ADDING_ANNOTATION'
+  payload: AnnotationData.Annotation | null
 }
 
 export interface DeleteAnnotationAction {

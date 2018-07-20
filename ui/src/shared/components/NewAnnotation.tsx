@@ -5,7 +5,13 @@ import {connect} from 'react-redux'
 import uuid from 'uuid'
 
 import AnnotationWindow from 'src/shared/components/AnnotationWindow'
-import * as actions from 'src/shared/actions/annotations'
+import {
+  addAnnotationAsync,
+  setAddingAnnotation,
+  addingAnnotationSuccess,
+  mouseEnterTempAnnotation,
+  mouseLeaveTempAnnotation,
+} from 'src/shared/actions/annotations'
 
 import {DYGRAPH_CONTAINER_XLABEL_MARGIN} from 'src/shared/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -16,10 +22,10 @@ interface Props {
   source: Source
   isTempHovering: boolean
   selectedLabels: string[]
-  tempAnnotation: Annotation
-  addAnnotationAsync: (url: string, a: Annotation) => void
+  addingAnnotation: Annotation
+  onAddAnnotationAsync: (url: string, a: Annotation) => void
+  onSetAddingAnnotation: (a: Annotation) => void
   onAddingAnnotationSuccess: () => void
-  onUpdateAnnotation: (a: Annotation) => void
   onMouseEnterTempAnnotation: () => void
   onMouseLeaveTempAnnotation: () => void
   staticLegendHeight: number
@@ -45,8 +51,8 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
     const {
       dygraph,
       isTempHovering,
-      tempAnnotation,
-      tempAnnotation: {startTime, endTime},
+      addingAnnotation,
+      addingAnnotation: {startTime, endTime},
       staticLegendHeight,
     } = this.props
     const {isMouseOver} = this.state
@@ -70,7 +76,7 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
       <div>
         {isDragging && (
           <AnnotationWindow
-            annotation={tempAnnotation}
+            annotation={addingAnnotation}
             dygraph={dygraph}
             active={true}
             staticLegendHeight={staticLegendHeight}
@@ -94,7 +100,7 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
             >
               {isMouseOver &&
                 isDragging &&
-                this.renderTimestamp(tempAnnotation.endTime)}
+                this.renderTimestamp(addingAnnotation.endTime)}
               <div className={flagTwoClass} />
             </div>
           )}
@@ -104,7 +110,7 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
           >
             {isMouseOver &&
               !isDragging &&
-              this.renderTimestamp(tempAnnotation.startTime)}
+              this.renderTimestamp(addingAnnotation.startTime)}
             <div className={isDragging ? flagOneClass : pointFlagClass} />
           </div>
         </div>
@@ -131,7 +137,10 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
 
   private handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     const startTime = this.eventToTimestamp(e)
-    this.props.onUpdateAnnotation({...this.props.tempAnnotation, startTime})
+    this.props.onSetAddingAnnotation({
+      ...this.props.addingAnnotation,
+      startTime,
+    })
     this.setState({gatherMode: 'endTime'})
   }
 
@@ -140,26 +149,26 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
       return
     }
 
-    const {tempAnnotation, onUpdateAnnotation} = this.props
+    const {addingAnnotation, onSetAddingAnnotation} = this.props
     const newTime = this.eventToTimestamp(e)
 
     if (this.state.gatherMode === 'startTime') {
-      onUpdateAnnotation({
-        ...tempAnnotation,
+      onSetAddingAnnotation({
+        ...addingAnnotation,
         startTime: newTime,
         endTime: newTime,
       })
     } else {
-      onUpdateAnnotation({...tempAnnotation, endTime: newTime})
+      onSetAddingAnnotation({...addingAnnotation, endTime: newTime})
     }
   }
 
   private handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
     const {
-      tempAnnotation,
+      addingAnnotation,
       selectedLabels,
-      onUpdateAnnotation,
-      addAnnotationAsync,
+      onSetAddingAnnotation,
+      onAddAnnotationAsync,
       onAddingAnnotationSuccess,
       onMouseLeaveTempAnnotation,
       source,
@@ -167,17 +176,17 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
     const createUrl = source.links.annotations
 
     const upTime = this.eventToTimestamp(e)
-    const downTime = tempAnnotation.startTime
+    const downTime = addingAnnotation.startTime
     const [startTime, endTime] = [downTime, upTime].sort()
     const newAnnotation = {
-      ...tempAnnotation,
+      ...addingAnnotation,
       startTime,
       endTime,
       labels: selectedLabels,
     }
 
-    onUpdateAnnotation(newAnnotation)
-    addAnnotationAsync(createUrl, {...newAnnotation, id: uuid.v4()})
+    onSetAddingAnnotation(newAnnotation)
+    onAddAnnotationAsync(createUrl, {...newAnnotation, id: uuid.v4()})
 
     onAddingAnnotationSuccess()
     onMouseLeaveTempAnnotation()
@@ -216,7 +225,16 @@ const mstp = ({annotations: {selectedLabels}}, {params: {dashboardID}}) => {
 }
 
 const mdtp = {
-  addAnnotationAsync: actions.addAnnotationAsync,
+  onAddAnnotationAsync: addAnnotationAsync,
+  onSetAddingAnnotation: setAddingAnnotation,
+  onAddingAnnotationSuccess: addingAnnotationSuccess,
+  onMouseEnterTempAnnotation: mouseEnterTempAnnotation,
+  onMouseLeaveTempAnnotation: mouseLeaveTempAnnotation,
 }
 
-export default withRouter(connect(mstp, mdtp)(NewAnnotation))
+export default withRouter(
+  connect(
+    mstp,
+    mdtp
+  )(NewAnnotation)
+)

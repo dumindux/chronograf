@@ -6,19 +6,13 @@ import AnnotationComponent from 'src/shared/components/Annotation'
 import NewAnnotation from 'src/shared/components/NewAnnotation'
 import {SourceContext} from 'src/CheckSources'
 
-import {ADDING, TEMP_ANNOTATION} from 'src/shared/annotations/helpers'
+import {getSelectedAnnotations} from 'src/shared/selectors/annotations'
+import {ADDING} from 'src/shared/annotations/helpers'
 
-import {
-  updateAnnotation,
-  addingAnnotationSuccess,
-  mouseEnterTempAnnotation,
-  mouseLeaveTempAnnotation,
-} from 'src/shared/actions/annotations'
 import {visibleAnnotations} from 'src/shared/annotations/helpers'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 
 import {Annotation, DygraphClass, Source} from 'src/types'
-import {UpdateAnnotationAction} from 'src/types/actions/annotations'
 
 interface Props {
   dWidth: number
@@ -28,7 +22,7 @@ interface Props {
   xAxisRange: [number, number]
   dygraph: DygraphClass
   isTempHovering: boolean
-  handleUpdateAnnotation: (annotation: Annotation) => UpdateAnnotationAction
+  addingAnnotation?: Annotation
   handleAddingAnnotationSuccess: () => void
   handleMouseEnterTempAnnotation: () => void
   handleMouseLeaveTempAnnotation: () => void
@@ -42,8 +36,9 @@ class Annotations extends Component<Props> {
       dWidth,
       dygraph,
       xAxisRange,
+      annotations,
       isTempHovering,
-      handleUpdateAnnotation,
+      addingAnnotation,
       handleAddingAnnotationSuccess,
       handleMouseEnterTempAnnotation,
       handleMouseLeaveTempAnnotation,
@@ -52,16 +47,15 @@ class Annotations extends Component<Props> {
     return (
       <div className="annotations-container">
         {mode === ADDING &&
-          this.tempAnnotation && (
+          addingAnnotation && (
             <SourceContext.Consumer>
               {(source: Source) => (
                 <NewAnnotation
                   dygraph={dygraph}
                   source={source}
                   isTempHovering={isTempHovering}
-                  tempAnnotation={this.tempAnnotation}
+                  addingAnnotation={addingAnnotation}
                   staticLegendHeight={staticLegendHeight}
-                  onUpdateAnnotation={handleUpdateAnnotation}
                   onAddingAnnotationSuccess={handleAddingAnnotationSuccess}
                   onMouseEnterTempAnnotation={handleMouseEnterTempAnnotation}
                   onMouseLeaveTempAnnotation={handleMouseLeaveTempAnnotation}
@@ -69,7 +63,7 @@ class Annotations extends Component<Props> {
               )}
             </SourceContext.Consumer>
           )}
-        {this.annotations.map(a => (
+        {annotations.map(a => (
           <AnnotationComponent
             key={a.id}
             mode={mode}
@@ -83,47 +77,22 @@ class Annotations extends Component<Props> {
       </div>
     )
   }
-
-  get annotations() {
-    return visibleAnnotations(
-      this.props.xAxisRange,
-      this.props.annotations,
-      TEMP_ANNOTATION.id
-    )
-  }
-
-  get tempAnnotation() {
-    return this.props.annotations.find(a => a.id === TEMP_ANNOTATION.id)
-  }
 }
 
-const mstp = (state, ownProps) => {
-  const {annotations, mode, isTempHovering, selectedLabels} = state.annotations
-  const dashboardID = ownProps.params.dashboardID
-  const labels = selectedLabels[dashboardID] || []
+const mstp = (state, props) => {
+  const {mode, isTempHovering, addingAnnotation} = state.annotations
 
-  let selectedAnnotations = Object.values<Annotation>(annotations).filter(
-    a => !!a
+  const annotations = visibleAnnotations(
+    props.xAxisRange,
+    getSelectedAnnotations(state, props)
   )
 
-  if (labels.length) {
-    selectedAnnotations = selectedAnnotations.filter(a =>
-      labels.every(v => !!a.labels && a.labels.includes(v))
-    )
-  }
-
   return {
-    annotations: selectedAnnotations,
+    annotations,
+    addingAnnotation,
     mode: mode || 'NORMAL',
     isTempHovering,
   }
 }
 
-const mdtp = {
-  handleAddingAnnotationSuccess: addingAnnotationSuccess,
-  handleMouseEnterTempAnnotation: mouseEnterTempAnnotation,
-  handleMouseLeaveTempAnnotation: mouseLeaveTempAnnotation,
-  handleUpdateAnnotation: updateAnnotation,
-}
-
-export default withRouter(connect(mstp, mdtp)(Annotations))
+export default withRouter(connect(mstp)(Annotations))

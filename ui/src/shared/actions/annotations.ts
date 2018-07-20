@@ -53,6 +53,13 @@ export const updateAnnotation = (
   },
 })
 
+export const setAddingAnnotation = (
+  annotation: AnnotationsModels.Annotation | null
+): AnnotationsActions.SetAddingAnnotationAction => ({
+  type: 'SET_ADDING_ANNOTATION',
+  payload: annotation,
+})
+
 export const deleteAnnotation = (
   annotation: AnnotationsModels.Annotation
 ): AnnotationsActions.DeleteAnnotationAction => ({

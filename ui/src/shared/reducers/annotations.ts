@@ -1,4 +1,8 @@
-import {ADDING, EDITING, TEMP_ANNOTATION} from 'src/shared/annotations/helpers'
+import {
+  ADDING,
+  EDITING,
+  DEFAULT_ANNOTATION,
+} from 'src/shared/annotations/helpers'
 
 import {Action} from 'src/types/actions/annotations'
 import {Annotation, RemoteDataState} from 'src/types'
@@ -10,6 +14,7 @@ export interface AnnotationState {
     [annotationId: string]: Annotation
   }
   editingAnnotation: string | null
+  addingAnnotation?: Annotation
   allLabels: string[]
   allLabelsStatus: RemoteDataState
   selectedLabels: {
@@ -51,10 +56,7 @@ const annotationsReducer = (
         ...state,
         mode: ADDING,
         isTempHovering: true,
-        annotations: {
-          ...state.annotations,
-          [TEMP_ANNOTATION.id]: TEMP_ANNOTATION,
-        },
+        addingAnnotation: DEFAULT_ANNOTATION(),
       }
     }
 
@@ -71,10 +73,7 @@ const annotationsReducer = (
         ...state,
         isTempHovering: false,
         mode: null,
-        annotations: {
-          ...state.annotations,
-          [TEMP_ANNOTATION.id]: null,
-        },
+        addingAnnotation: null,
       }
     }
 
@@ -118,6 +117,13 @@ const annotationsReducer = (
           ...state.annotations,
           [annotation.id]: annotation,
         },
+      }
+    }
+
+    case 'SET_ADDING_ANNOTATION': {
+      return {
+        ...state,
+        addingAnnotation: action.payload,
       }
     }
 

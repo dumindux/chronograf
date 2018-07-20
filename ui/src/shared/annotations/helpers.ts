@@ -5,18 +5,17 @@ export const ANNOTATION_MIN_DELTA = 0.5
 export const ADDING = 'adding'
 export const EDITING = 'editing'
 
-export const TEMP_ANNOTATION: Annotation = {
+export const DEFAULT_ANNOTATION = (): Annotation => ({
   id: 'tempAnnotation',
   text: 'Name Me',
   startTime: null,
   endTime: null,
   links: {self: ''},
-}
+})
 
 export const visibleAnnotations = (
   xAxisRange: [number, number],
-  annotations: Annotation[] = [],
-  tempAnnotationID: string
+  annotations: Annotation[] = []
 ): Annotation[] => {
   const [xStart, xEnd] = xAxisRange
 
@@ -25,9 +24,6 @@ export const visibleAnnotations = (
   }
 
   return annotations.filter(a => {
-    if (a.id === tempAnnotationID) {
-      return false
-    }
     if (a.startTime === null || a.endTime === null) {
       return false
     }
