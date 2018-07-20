@@ -1,17 +1,22 @@
 import React, {PureComponent} from 'react'
+import {connect} from 'react-redux'
 
 import OverlayContainer from 'src/reusable_ui/components/overlays/OverlayContainer'
 import OverlayHeading from 'src/reusable_ui/components/overlays/OverlayHeading'
 import OverlayBody from 'src/reusable_ui/components/overlays/OverlayBody'
 import AnnotationEditorForm from 'src/shared/components/AnnotationEditorForm'
 
+import {loadAnnotationLabels} from 'src/shared/actions/annotations'
+
 import {Annotation, RemoteDataState} from 'src/types'
 
 interface Props {
   annotation: Annotation
+  allLabels: string[]
   onCancel: () => void
   onSave: (annotation: Annotation) => Promise<void>
   onDelete: () => Promise<void>
+  onLoadAnnotationLabels: typeof loadAnnotationLabels
 }
 
 interface State {
@@ -81,13 +86,33 @@ class AnnotationEditor extends PureComponent<Props, State> {
       return
     }
 
-    const {onSave} = this.props
+    const {onSave, allLabels, onLoadAnnotationLabels} = this.props
     const {draftAnnotation} = this.state
 
     this.setState({savingStatus: RemoteDataState.Loading})
 
     await onSave(draftAnnotation)
+
+    const labelsToAdd = []
+
+    draftAnnotation.labels
+      .filter(label => !allLabels.includes(label))
+      .forEach(label => labelsToAdd.push(label))
+
+    if (labelsToAdd.length) {
+      onLoadAnnotationLabels([...allLabels, ...labelsToAdd])
+    }
   }
 }
 
-export default AnnotationEditor
+const mstp = state => {
+  return {
+    allLabels: state.annotations.allLabels,
+  }
+}
+
+const mdtp = {
+  onLoadAnnotationLabels: loadAnnotationLabels,
+}
+
+export default connect(mstp, mdtp)(AnnotationEditor)
