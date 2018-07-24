@@ -5,20 +5,23 @@ import {
 } from 'src/shared/annotations/helpers'
 
 import {Action} from 'src/types/actions/annotations'
-import {Annotation, RemoteDataState} from 'src/types'
+import {Annotation, TagFilter} from 'src/types/annotations'
 
 export interface AnnotationState {
-  mode: string
-  isTempHovering: boolean
   annotations: {
     [annotationId: string]: Annotation
   }
-  editingAnnotation: string | null
+  mode: string
+  isTempHovering: boolean
+  editingAnnotation?: string
   addingAnnotation?: Annotation
-  allLabels: string[]
-  allLabelsStatus: RemoteDataState
-  selectedLabels: {
-    [dashboardId: number]: string[]
+  addingTagFilter?: TagFilter
+  tagKeys?: string[]
+  tagValues: {
+    [tagKey: string]: string[]
+  }
+  tagFilters: {
+    [dashboardId: number]: TagFilter[]
   }
 }
 
@@ -26,10 +29,9 @@ const initialState = {
   mode: null,
   isTempHovering: false,
   annotations: {},
-  editingAnnotation: null,
-  allLabels: [],
-  allLabelsStatus: RemoteDataState.NotStarted,
-  selectedLabels: {},
+  tagKeys: null,
+  tagValues: {},
+  tagFilters: {},
 }
 
 const annotationsReducer = (
@@ -158,33 +160,61 @@ const annotationsReducer = (
       }
     }
 
-    case 'TOGGLE_LABEL': {
-      const {label, dashboardId} = action.payload
-      const labels = new Set(state.selectedLabels[dashboardId])
-
-      if (labels.has(label)) {
-        labels.delete(label)
-      } else {
-        labels.add(label)
-      }
+    case 'SET_TAG_FILTER': {
+      const {tagFilter, dashboardId} = action.payload
+      const prevTagFilters = state.tagFilters[dashboardId] || []
+      const tagFilters = [
+        ...prevTagFilters.filter(t => t.tagKey !== tagFilter.tagKey),
+        tagFilter,
+      ]
 
       return {
         ...state,
-        selectedLabels: {
-          ...state.selectedLabels,
-          [dashboardId]: [...labels],
+        tagFilters: {
+          ...state.tagFilters,
+          [dashboardId]: tagFilters,
         },
       }
     }
 
-    case 'SET_ANNOTATION_LABELS_STATUS': {
-      return {...state, allLabelsStatus: action.payload}
+    case 'REMOVE_TAG_FILTER': {
+      const {tagKey, dashboardId} = action.payload
+      const prevTagFilters = state.tagFilters[dashboardId] || []
+      const tagFilters = prevTagFilters.filter(t => t.tagKey !== tagKey)
+
+      return {
+        ...state,
+        tagFilters: {
+          ...state.tagFilters,
+          [dashboardId]: tagFilters,
+        },
+      }
     }
 
-    case 'LOAD_ANNOTATION_LABELS': {
-      const allLabels = action.payload
+    case 'SET_ADDING_TAG_FILTER': {
+      return {
+        ...state,
+        addingTagFilter: action.payload,
+      }
+    }
 
-      return {...state, allLabels}
+    case 'SET_TAG_KEYS': {
+      return {
+        ...state,
+        tagKeys: action.payload,
+      }
+    }
+
+    case 'SET_TAG_VALUES': {
+      const {tagKey, tagValues} = action.payload
+
+      return {
+        ...state,
+        tagValues: {
+          ...state.tagValues,
+          [tagKey]: tagValues,
+        },
+      }
     }
   }
 

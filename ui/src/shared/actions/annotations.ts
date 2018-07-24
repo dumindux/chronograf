@@ -4,8 +4,7 @@ import {Dispatch} from 'redux'
 import {getAnnotations} from 'src/shared/apis/annotation'
 
 import * as AnnotationsActions from 'src/types/actions/annotations'
-import * as AnnotationsModels from 'src/types/annotations'
-import {RemoteDataState} from 'src/types'
+import {Annotation, AnnotationRange, TagFilter} from 'src/types/annotations'
 
 export const editingAnnotation = (): AnnotationsActions.EditingAnnotationAction => ({
   type: 'EDITING_ANNOTATION',
@@ -36,7 +35,7 @@ export const mouseLeaveTempAnnotation = (): AnnotationsActions.MouseLeaveTempAnn
 })
 
 export const loadAnnotations = (
-  annotations: AnnotationsModels.Annotation[]
+  annotations: Annotation[]
 ): AnnotationsActions.LoadAnnotationsAction => ({
   type: 'LOAD_ANNOTATIONS',
   payload: {
@@ -45,7 +44,7 @@ export const loadAnnotations = (
 })
 
 export const updateAnnotation = (
-  annotation: AnnotationsModels.Annotation
+  annotation: Annotation
 ): AnnotationsActions.UpdateAnnotationAction => ({
   type: 'UPDATE_ANNOTATION',
   payload: {
@@ -54,14 +53,14 @@ export const updateAnnotation = (
 })
 
 export const setAddingAnnotation = (
-  annotation: AnnotationsModels.Annotation | null
+  annotation: Annotation | null
 ): AnnotationsActions.SetAddingAnnotationAction => ({
   type: 'SET_ADDING_ANNOTATION',
   payload: annotation,
 })
 
 export const deleteAnnotation = (
-  annotation: AnnotationsModels.Annotation
+  annotation: Annotation
 ): AnnotationsActions.DeleteAnnotationAction => ({
   type: 'DELETE_ANNOTATION',
   payload: {
@@ -70,7 +69,7 @@ export const deleteAnnotation = (
 })
 
 export const addAnnotation = (
-  annotation: AnnotationsModels.Annotation
+  annotation: Annotation
 ): AnnotationsActions.AddAnnotationAction => ({
   type: 'ADD_ANNOTATION',
   payload: {
@@ -85,31 +84,47 @@ export const setEditingAnnotation = (
   payload: id,
 })
 
-export const toggleLabel = (
-  label: string,
-  dashboardId: number
-): AnnotationsActions.ToggleLabelAction => ({
-  type: 'TOGGLE_LABEL',
-  payload: {label, dashboardId},
+export const setTagFilter = (
+  dashboardId: number,
+  tagFilter: TagFilter | null
+): AnnotationsActions.SetTagFilterAction => ({
+  type: 'SET_TAG_FILTER',
+  payload: {dashboardId, tagFilter},
 })
 
-export const setAnnotationLabelsStatus = (
-  status: RemoteDataState
-): AnnotationsActions.SetAnnotationLabelsStatusAction => ({
-  type: 'SET_ANNOTATION_LABELS_STATUS',
-  payload: status,
+export const removeTagFilter = (
+  dashboardId: number,
+  tagKey: string
+): AnnotationsActions.RemoveTagFilterAction => ({
+  type: 'REMOVE_TAG_FILTER',
+  payload: {dashboardId, tagKey},
 })
 
-export const loadAnnotationLabels = (
-  labels: string[]
-): AnnotationsActions.LoadAnnotationLabelsAction => ({
-  type: 'LOAD_ANNOTATION_LABELS',
-  payload: labels,
+export const setAddingTagFilter = (
+  addingTagFilter: TagFilter
+): AnnotationsActions.SetAddingTagFilterAction => ({
+  type: 'SET_ADDING_TAG_FILTER',
+  payload: addingTagFilter,
+})
+
+export const setTagKeys = (
+  tagKeys: string[]
+): AnnotationsActions.SetTagKeysAction => ({
+  type: 'SET_TAG_KEYS',
+  payload: tagKeys,
+})
+
+export const setTagValues = (
+  tagKey: string,
+  tagValues: string[]
+): AnnotationsActions.SetTagValuesAction => ({
+  type: 'SET_TAG_VALUES',
+  payload: {tagKey, tagValues},
 })
 
 export const addAnnotationAsync = (
   createUrl: string,
-  annotation: AnnotationsModels.Annotation
+  annotation: Annotation
 ) => async dispatch => {
   dispatch(addAnnotation(annotation))
   const savedAnnotation = await api.createAnnotation(createUrl, annotation)
@@ -119,7 +134,7 @@ export const addAnnotationAsync = (
 
 export const getAnnotationsAsync: AnnotationsActions.GetAnnotationsDispatcher = (
   indexUrl: string,
-  {since, until}: AnnotationsModels.AnnotationRange
+  {since, until}: AnnotationRange
 ): AnnotationsActions.GetAnnotationsThunk => async (
   dispatch: Dispatch<AnnotationsActions.LoadAnnotationsAction>
 ): Promise<void> => {
@@ -129,28 +144,29 @@ export const getAnnotationsAsync: AnnotationsActions.GetAnnotationsDispatcher = 
 }
 
 export const deleteAnnotationAsync = (
-  annotation: AnnotationsModels.Annotation
+  annotation: Annotation
 ) => async dispatch => {
   await api.deleteAnnotation(annotation)
   dispatch(deleteAnnotation(annotation))
 }
 
 export const updateAnnotationAsync = (
-  annotation: AnnotationsModels.Annotation
+  annotation: Annotation
 ) => async dispatch => {
   await api.updateAnnotation(annotation)
   dispatch(updateAnnotation(annotation))
 }
 
-const delay = ms => new Promise(res => setTimeout(res, ms))
+export const fetchAndSetTagKeys = () => async dispatch => {
+  // TODO: Fetch tag keys
+  const tagKeys = await Promise.resolve([])
 
-const FAKE_ANNOTATION_LABELS = ['bam', 'slam', 'wham', 'jam', 'yam']
+  dispatch(setTagKeys(tagKeys))
+}
 
-export const getAnnotationLabelsAsync = () => async dispatch => {
-  dispatch(setAnnotationLabelsStatus(RemoteDataState.Loading))
+export const fetchAndSetTagValues = (tagKey: string) => async dispatch => {
+  // TODO: Fetch tag values
+  const tagValues = await Promise.resolve([])
 
-  await delay(1000)
-
-  dispatch(loadAnnotationLabels(FAKE_ANNOTATION_LABELS))
-  dispatch(setAnnotationLabelsStatus(RemoteDataState.Done))
+  dispatch(setTagValues(tagKey, tagValues))
 }
