@@ -10,31 +10,25 @@
   font-size: 14px;
   font-weight: 500;
   @include no-user-select();
+
+  .annotation-control-bar--add-filter {
+    > .icon {
+      margin: 0;
+    }
+  }
+
+  .annotation-tag-filter {
+    margin-right: 10px;
+  }
 }
 
 .annotation-control-bar--lhs {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  flex-flow: wrap;
 }
 
-.annotation-control-bar--label {
-  margin-right: 5px;
-  background-color: $g2-kevlar;
-  padding: 12px 15px;
-  border-radius: 4px;
-  color: $g12-forge;
-  text-shadow: none;
-  border-width: 0;
-  font-size: 13px;
-  font-weight: 600;
-
-  &:hover, &.selected {
-    background-color: $g6-smoke;
-    color: $g16-pearl;
-    cursor: pointer;
-  }
-}
 
 .toolbar-title {
   display: block;
@@ -43,4 +37,61 @@
   font-size: 14px;
   font-weight: bold;
   @include no-user-select();
+}
+
+.annotation-tag-filter {
+  display: flex;
+  align-items: center;
+  background-color: $g5-pepper;
+  padding: 4px 5px;
+  border-radius: 4px;
+  text-shadow: none;
+  border-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+
+  .annotation-tag-filter--tag-key, 
+  .annotation-tag-filter--filter-type,
+  .annotation-tag-filter--tag-value {
+    color: $g16-pearl;
+  }
+
+  input {
+    width: 80px;
+  }
+
+  .annotation-tag-filter--filter-type {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: $form-xs-height - 4px;
+    background-color: $g6-smoke;
+    margin: 0 5px;
+    padding: 0 6px 1px 6px;
+    border-radius: 4px;
+    font-family: $code-font;
+    font-weight: bold;
+    cursor: pointer;
+
+    &:hover {
+      background: $g8-storm;
+      color: $g20-white;
+    }
+  }
+
+  .btn-xs {
+    height: $form-xs-height - 4px;
+    width: 20px;
+    margin-left: 3px;
+
+    .icon {
+      display: block;
+      padding-top: 3px;
+      margin-left: -4px;
+
+      &.checkmark {
+        color: $c-rainforest;
+      }
+    }
+  }
 }

@@ -20,6 +20,7 @@ export enum TagFilterType {
 }
 
 export interface TagFilter {
+  id: string
   tagKey: string
   tagValue: string
   filterType: TagFilterType

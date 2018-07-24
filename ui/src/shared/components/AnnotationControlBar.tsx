@@ -1,28 +1,48 @@
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
-import AnnotationControlBarLabels from 'src/shared/components/AnnotationControlBarLabels'
 import AddAnnotationToggle from 'src/shared/components/AddAnnotationToggle'
+import TagFilterControl from 'src/shared/components/TagFilterControl'
+import NewTagFilterToggle from 'src/shared/components/NewTagFilterToggle'
 
-import {getAnnotationLabelsAsync} from 'src/shared/actions/annotations'
+import {
+  createTagFilter,
+  updateTagFilter,
+  deleteTagFilter,
+} from 'src/shared/actions/annotations'
+
+import {getTagFilters} from 'src/shared/selectors/annotations'
+
+import {TagFilter} from 'src/types/annotations'
+import {AnnotationState} from 'src/shared/reducers/annotations'
 
 interface Props {
   dashboardId: number
-  onGetAnnotationLabels: () => Promise<void>
+  tagFilters: TagFilter[]
+  onCreateTagFilter: typeof createTagFilter
+  onUpdateTagFilter: typeof updateTagFilter
+  onDeleteTagFilter: typeof deleteTagFilter
 }
 
 class AnnotationControlBar extends PureComponent<Props> {
-  public componentDidMount() {
-    this.props.onGetAnnotationLabels()
-  }
-
   public render() {
-    const {dashboardId} = this.props
+    const {tagFilters} = this.props
 
     return (
       <div className="annotation-control-bar">
         <div className="annotation-control-bar--lhs">
-          <AnnotationControlBarLabels dashboardId={dashboardId} />
+          <div className="toolbar-title">Filter Annotations by Tags:</div>
+          {tagFilters.map(tagFilter => (
+            <TagFilterControl
+              key={tagFilter.id}
+              tagFilter={tagFilter}
+              onUpdate={this.handleUpdateTagFilter}
+              onDelete={this.handleDeleteTagFilter}
+              onGetKeySuggestions={() => Promise.resolve([])}
+              onGetValueSuggestions={() => Promise.resolve([])}
+            />
+          ))}
+          <NewTagFilterToggle onCreate={this.handleCreateTagFilter} />
         </div>
         <div className="annotation-control-bar--rhs">
           <AddAnnotationToggle />
@@ -30,10 +50,39 @@ class AnnotationControlBar extends PureComponent<Props> {
       </div>
     )
   }
+
+  public handleCreateTagFilter = (t: TagFilter): void => {
+    const {dashboardId, onCreateTagFilter} = this.props
+
+    onCreateTagFilter(dashboardId, t)
+  }
+
+  public handleUpdateTagFilter = (t: TagFilter): void => {
+    const {dashboardId, onUpdateTagFilter} = this.props
+
+    onUpdateTagFilter(dashboardId, t)
+  }
+
+  public handleDeleteTagFilter = (t: TagFilter): void => {
+    const {dashboardId, onDeleteTagFilter} = this.props
+
+    onDeleteTagFilter(dashboardId, t)
+  }
+}
+
+const mstp = (
+  state: {annotations: AnnotationState},
+  ownProps: {dashboardId: number}
+): Partial<Props> => {
+  return {
+    tagFilters: getTagFilters(state, ownProps.dashboardId),
+  }
 }
 
 const mdtp = {
-  onGetAnnotationLabels: getAnnotationLabelsAsync,
+  onCreateTagFilter: createTagFilter,
+  onUpdateTagFilter: updateTagFilter,
+  onDeleteTagFilter: deleteTagFilter,
 }
 
-export default connect(null, mdtp)(AnnotationControlBar)
+export default connect(mstp, mdtp)(AnnotationControlBar)

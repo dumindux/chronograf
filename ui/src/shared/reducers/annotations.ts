@@ -4,8 +4,8 @@ import {
   DEFAULT_ANNOTATION,
 } from 'src/shared/annotations/helpers'
 
-import {Action} from 'src/types/actions/annotations'
-import {Annotation, TagFilter} from 'src/types/annotations'
+import {Action} from 'src/shared/actions/annotations'
+import {Annotation, TagFilter, TagFilterType} from 'src/types/annotations'
 
 export interface AnnotationState {
   annotations: {
@@ -21,7 +21,9 @@ export interface AnnotationState {
     [tagKey: string]: string[]
   }
   tagFilters: {
-    [dashboardId: number]: TagFilter[]
+    [dashboardId: number]: {
+      [tagFilterId: string]: TagFilter
+    }
   }
 }
 
@@ -31,7 +33,16 @@ const initialState = {
   annotations: {},
   tagKeys: null,
   tagValues: {},
-  tagFilters: {},
+  tagFilters: {
+    18: {
+      a: {
+        id: 'a',
+        tagKey: 'foo',
+        filterType: TagFilterType.Equals,
+        tagValue: 'bar',
+      },
+    },
+  },
 }
 
 const annotationsReducer = (
@@ -160,33 +171,34 @@ const annotationsReducer = (
       }
     }
 
-    case 'SET_TAG_FILTER': {
+    case 'CREATE_TAG_FILTER':
+    case 'UPDATE_TAG_FILTER': {
       const {tagFilter, dashboardId} = action.payload
-      const prevTagFilters = state.tagFilters[dashboardId] || []
-      const tagFilters = [
-        ...prevTagFilters.filter(t => t.tagKey !== tagFilter.tagKey),
-        tagFilter,
-      ]
+      const dashboardTagFilters = state.tagFilters[dashboardId] || {}
 
       return {
         ...state,
         tagFilters: {
-          ...state.tagFilters,
-          [dashboardId]: tagFilters,
+          [dashboardId]: {
+            ...dashboardTagFilters,
+            [tagFilter.id]: tagFilter,
+          },
         },
       }
     }
 
-    case 'REMOVE_TAG_FILTER': {
-      const {tagKey, dashboardId} = action.payload
-      const prevTagFilters = state.tagFilters[dashboardId] || []
-      const tagFilters = prevTagFilters.filter(t => t.tagKey !== tagKey)
+    case 'DELETE_TAG_FILTER': {
+      const {tagFilter, dashboardId} = action.payload
+      const dashboardTagFilters = state.tagFilters[dashboardId] || {}
 
       return {
         ...state,
         tagFilters: {
           ...state.tagFilters,
-          [dashboardId]: tagFilters,
+          [dashboardId]: {
+            ...dashboardTagFilters,
+            [tagFilter.id]: null,
+          },
         },
       }
     }

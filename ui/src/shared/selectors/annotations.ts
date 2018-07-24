@@ -1,32 +1,24 @@
 import {createSelector} from 'reselect'
 
-import {Annotation} from 'src/types'
+import {Annotation, TagFilter} from 'src/types/Annotations'
+import {AnnotationState} from 'src/shared/reducers/annotations'
 
-export const getSelectedLabels = (state, props): string[] => {
-  const {selectedLabels} = state.annotations
-  const dashboardID = props.params.dashboardID
-
-  return selectedLabels[dashboardID]
-}
-
-const getAnnotationsById = state => state.annotations.annotations
+const getAnnotationsById = (state: {annotations: AnnotationState}) =>
+  state.annotations.annotations
 
 export const getSelectedAnnotations = createSelector(
-  getSelectedLabels,
   getAnnotationsById,
-  (selectedLabels, annotationsById) => {
-    console.log('computed')
-
-    const allAnnotations = Object.values<Annotation>(annotationsById).filter(
-      a => !!a
-    )
-
-    if (!selectedLabels || !selectedLabels.length) {
-      return allAnnotations
-    }
-
-    return allAnnotations.filter(a =>
-      selectedLabels.every(v => !!a.labels && a.labels.includes(v))
-    )
+  annotationsById => {
+    // TODO: Filter by tagFilters from state
+    return Object.values<Annotation>(annotationsById).filter(a => !!a)
   }
 )
+
+export const getTagFilters = (
+  state: {annotations: AnnotationState},
+  dashboardId
+): TagFilter[] => {
+  return Object.values(state.annotations.tagFilters[dashboardId] || {}).filter(
+    v => !!v
+  )
+}

@@ -19,8 +19,9 @@ export type Action =
   | DeleteAnnotationAction
   | AddAnnotationAction
   | SetEditingAnnotationAction
-  | SetTagFilterAction
-  | RemoveTagFilterAction
+  | CreateTagFilterAction
+  | UpdateTagFilterAction
+  | DeleteTagFilterAction
   | SetAddingTagFilterAction
   | SetTagKeysAction
   | SetTagValuesAction
@@ -167,36 +168,55 @@ export const setEditingAnnotation = (
   payload: id,
 })
 
-interface SetTagFilterAction {
-  type: 'SET_TAG_FILTER'
+interface CreateTagFilterAction {
+  type: 'CREATE_TAG_FILTER'
   payload: {
     dashboardId: number
-    tagFilter: TagFilter | null
+    tagFilter: TagFilter
   }
 }
 
-export const setTagFilter = (
+export const createTagFilter = (
   dashboardId: number,
-  tagFilter: TagFilter | null
-): SetTagFilterAction => ({
-  type: 'SET_TAG_FILTER',
+  tagFilter: TagFilter
+): CreateTagFilterAction => ({
+  type: 'CREATE_TAG_FILTER',
+  payload: {
+    dashboardId,
+    tagFilter,
+  },
+})
+
+interface UpdateTagFilterAction {
+  type: 'UPDATE_TAG_FILTER'
+  payload: {
+    dashboardId: number
+    tagFilter: TagFilter
+  }
+}
+
+export const updateTagFilter = (
+  dashboardId: number,
+  tagFilter: TagFilter,
+): UpdateTagFilterAction => ({
+  type: 'UPDATE_TAG_FILTER',
   payload: {dashboardId, tagFilter},
 })
 
-interface RemoveTagFilterAction {
-  type: 'REMOVE_TAG_FILTER'
+interface DeleteTagFilterAction {
+  type: 'DELETE_TAG_FILTER'
   payload: {
     dashboardId: number
-    tagKey: string
+    tagFilter: TagFilter
   }
 }
 
-export const removeTagFilter = (
+export const deleteTagFilter = (
   dashboardId: number,
-  tagKey: string
-): RemoveTagFilterAction => ({
-  type: 'REMOVE_TAG_FILTER',
-  payload: {dashboardId, tagKey},
+  tagFilter: TagFilter
+): DeleteTagFilterAction => ({
+  type: 'DELETE_TAG_FILTER',
+  payload: {dashboardId, tagFilter},
 })
 
 interface SetAddingTagFilterAction {
