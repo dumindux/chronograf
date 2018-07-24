@@ -86,7 +86,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   getAnnotationsAsync: AnnotationsActions.GetAnnotationsDispatcher
   handleShowCellEditorOverlay: typeof cellEditorOverlayActions.showCellEditorOverlay
   handleHideCellEditorOverlay: typeof cellEditorOverlayActions.hideCellEditorOverlay
-  handleDismissEditingAnnotation: AnnotationsActions.DismissEditingAnnotationActionCreator
+  handleDismissEditingAnnotation: typeof annotationActions.dismissEditingAnnotation
   selectedCell: DashboardsModels.Cell
   thresholdsListType: string
   thresholdsListColors: ColorsModels.ColorNumber[]
@@ -584,6 +584,7 @@ const mdtp = {
   handleDismissEditingAnnotation: annotationActions.dismissEditingAnnotation,
 }
 
-export default connect(mstp, mdtp)(
-  ManualRefresh<Props>(withRouter<Props>(DashboardPage))
-)
+export default connect(
+  mstp,
+  mdtp
+)(ManualRefresh<Props>(withRouter<Props>(DashboardPage)))

@@ -37,7 +37,7 @@ const initialState = {
 const annotationsReducer = (
   state: AnnotationState = initialState,
   action: Action
-) => {
+): AnnotationState => {
   switch (action.type) {
     case 'EDITING_ANNOTATION': {
       return {
