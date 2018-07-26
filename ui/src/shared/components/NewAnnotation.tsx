@@ -21,7 +21,6 @@ interface Props {
   dygraph: DygraphClass
   source: Source
   isTempHovering: boolean
-  selectedLabels: string[]
   addingAnnotation: Annotation
   onAddAnnotationAsync: (url: string, a: Annotation) => void
   onSetAddingAnnotation: (a: Annotation) => void
@@ -30,6 +29,7 @@ interface Props {
   onMouseLeaveTempAnnotation: () => void
   staticLegendHeight: number
 }
+
 interface State {
   isMouseOver: boolean
   gatherMode: string
@@ -166,7 +166,6 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
   private handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
     const {
       addingAnnotation,
-      selectedLabels,
       onSetAddingAnnotation,
       onAddAnnotationAsync,
       onAddingAnnotationSuccess,
@@ -182,7 +181,6 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
       ...addingAnnotation,
       startTime,
       endTime,
-      labels: selectedLabels,
     }
 
     onSetAddingAnnotation(newAnnotation)
@@ -220,10 +218,6 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
   }
 }
 
-const mstp = ({annotations: {selectedLabels}}, {params: {dashboardID}}) => {
-  return {selectedLabels: selectedLabels[+dashboardID] || []}
-}
-
 const mdtp = {
   onAddAnnotationAsync: addAnnotationAsync,
   onSetAddingAnnotation: setAddingAnnotation,
@@ -232,9 +226,4 @@ const mdtp = {
   onMouseLeaveTempAnnotation: mouseLeaveTempAnnotation,
 }
 
-export default withRouter(
-  connect(
-    mstp,
-    mdtp
-  )(NewAnnotation)
-)
+export default withRouter(connect(null, mdtp)(NewAnnotation))
