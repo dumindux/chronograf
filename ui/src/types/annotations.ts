@@ -3,7 +3,7 @@ export interface Annotation {
   startTime: number
   endTime: number
   text: string
-  labels?: string[]
+  tags?: AnnotationTags
   links: {self: string}
 }
 
@@ -24,4 +24,8 @@ export interface TagFilter {
   tagKey: string
   tagValue: string
   filterType: TagFilterType
+}
+
+export interface AnnotationTags {
+  [tagKey: string]: string
 }

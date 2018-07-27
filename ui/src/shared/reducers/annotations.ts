@@ -27,10 +27,27 @@ export interface AnnotationState {
   }
 }
 
+const recent = Date.now() - 1000 * 60
+
 const initialState = {
   mode: null,
   isTempHovering: false,
-  annotations: {},
+  annotations: {
+    '49ee1a85-a51a-4fea-9d2d-b9d692d2b41d': {
+      id: '49ee1a85-a51a-4fea-9d2d-b9d692d2b41d',
+      startTime: recent,
+      endTime: recent,
+      text: 'houston we have a problem',
+      tags: {
+        foo: 'bar',
+      },
+      links: {
+        self:
+          '/chronograf/v1/sources/6/annotations/49ee1a85-a51a-4fea-9d2d-b9d692d2b41d',
+      },
+    },
+  },
+  editingAnnotation: '49ee1a85-a51a-4fea-9d2d-b9d692d2b41d',
   tagKeys: null,
   tagValues: {},
   tagFilters: {

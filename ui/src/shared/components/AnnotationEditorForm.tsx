@@ -1,19 +1,21 @@
 import React, {PureComponent, ChangeEvent} from 'react'
+import uuid from 'uuid'
 import moment from 'moment'
 
 import RadioButtons from 'src/reusable_ui/components/radio_buttons/RadioButtons'
 import ConfirmButton from 'src/shared/components/ConfirmButton'
-import LabelInput from 'src/shared/components/LabelInput'
+import AnnotationTagEditorLi from 'src/shared/components/AnnotationTagEditorLi'
 
 import Debouncer from 'src/shared/utils/debouncer'
 
-import {Annotation} from 'src/types'
+import {Annotation} from 'src/types/annotations'
 
 const INPUT_DEBOUNCE_TIME = 600
 const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm:ss.SS'
 const BAD_DATETIME_ERROR = 'Not a valid date'
 const END_BEFORE_START_ERROR = 'End date must be after start date'
 const EMPTY_TEXT_ERROR = 'Name cannot be empty'
+const DUPLICATE_KEY_ERROR = 'Tag keys must be unique'
 
 const getTime = (d: string | number): number => new Date(d).getTime()
 const isValidDate = (d: string | number): boolean => !isNaN(getTime(d))
@@ -36,7 +38,7 @@ interface State {
   text: string
   startTime: number
   endTime: number
-  labels: string[]
+  tags: Array<{id: string; tagKey: string; tagValue: string}>
 
   // Current state
   startTimeInput: string
@@ -45,30 +47,38 @@ interface State {
   textError: string | null
   startTimeError: string | null
   endTimeError: string | null
+  tagsError: string | null
 }
 
 class AnnotationEditorForm extends PureComponent<Props, State> {
   private debouncer: Debouncer
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
 
     this.debouncer = props.debouncer || new Debouncer()
 
-    const {text, startTime, endTime, labels} = props.annotation
+    const {text, startTime, endTime} = props.annotation
     const type = startTime === endTime ? 'point' : 'window'
+
+    const tags = Object.entries(props.annotation.tags || {}).map(([k, v]) => ({
+      id: uuid.v4(),
+      tagKey: k,
+      tagValue: v,
+    }))
 
     this.state = {
       text,
       startTime: getTime(formatDate(startTime)),
       endTime: getTime(formatDate(endTime)),
-      labels: labels || [],
+      tags,
       type,
       startTimeInput: formatDate(startTime),
       startTimeError: null,
       endTimeInput: formatDate(endTime),
       endTimeError: null,
       textError: null,
+      tagsError: null,
     }
   }
 
@@ -81,12 +91,13 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
     const {
       type,
       text,
-      labels,
+      tags,
       startTimeInput,
       endTimeInput,
       textError,
       startTimeError,
       endTimeError,
+      tagsError,
     } = this.state
 
     return (
@@ -145,8 +156,27 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
         </div>
         <div className="row">
           <div className="form-group col-xs-12">
-            <label>Labels</label>
-            <LabelInput labels={labels} onSetLabels={this.handleSetLabels} />
+            <label>
+              Annotation Tags{' '}
+              {tagsError && <div className="error">{tagsError}</div>}
+            </label>
+            <div className="annotation-tag-editor">
+              {tags.map(({id, tagKey, tagValue}) => (
+                <AnnotationTagEditorLi
+                  key={id}
+                  tagKey={tagKey}
+                  tagValue={tagValue}
+                  onUpdate={this.handleUpdateTag(id)}
+                  onDelete={this.handleDeleteTag(id)}
+                />
+              ))}
+              <button
+                className="btn btn-sm btn-primary annotation-tag-editor--add"
+                onClick={this.handleAddTag}
+              >
+                <span className="icon plus" /> Add Tag
+              </button>
+            </div>
           </div>
         </div>
         <div className="row">
@@ -267,13 +297,37 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
     this.setState(nextState, () => this.setDraftAnnotation())
   }
 
-  private handleSetLabels = (labels: string[]) => {
-    if (new Set(labels).size !== labels.length) {
-      // Don't allow duplicate elements
-      return
+  private handleAddTag = (): void => {
+    const newTag = {id: uuid.v4(), tagKey: '', tagValue: ''}
+
+    this.setState({tags: [...this.state.tags, newTag]}, this.setDraftAnnotation)
+  }
+
+  private handleUpdateTag = (id: string) => (
+    tagKey: string,
+    tagValue: string
+  ): void => {
+    const {tags} = this.state
+    const newTag = {id, tagKey, tagValue}
+    const i = tags.findIndex(t => t.id === id)
+    const newTags = [...tags.slice(0, i), newTag, ...tags.slice(i + 1)]
+    const uniqueKeys = new Set(newTags.map(t => t.tagKey))
+
+    let nextState
+
+    if (uniqueKeys.size < tags.length) {
+      nextState = {tags: newTags, tagsError: DUPLICATE_KEY_ERROR}
+    } else {
+      nextState = {tags: newTags, tagsError: null}
     }
 
-    this.setState({labels}, () => this.setDraftAnnotation())
+    this.setState(nextState, this.setDraftAnnotation)
+  }
+
+  private handleDeleteTag = (id: string) => (): void => {
+    const tags = this.state.tags.filter(t => t.id !== id)
+
+    this.setState({tags}, this.setDraftAnnotation)
   }
 
   private setDraftAnnotation = (): void => {
@@ -286,21 +340,32 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
       startTimeError,
       endTimeError,
       textError,
-      labels,
+      tagsError,
+      tags,
     } = this.state
 
-    if (!!startTimeError || !!endTimeError || !!textError) {
+    if (!!startTimeError || !!endTimeError || !!textError || !!tagsError) {
       onSetDraftAnnotation(null)
 
       return
     }
+
+    const annotationTags = tags.reduce(
+      (acc, {tagKey, tagValue}) => ({
+        ...acc,
+        [tagKey]: tagValue,
+      }),
+      {}
+    )
+
+    delete annotationTags['']
 
     onSetDraftAnnotation({
       id: annotation.id,
       startTime,
       endTime: type === 'window' ? endTime : startTime,
       text,
-      labels,
+      tags: annotationTags,
       links: annotation.links,
     })
   }

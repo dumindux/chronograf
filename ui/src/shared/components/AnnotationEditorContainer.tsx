@@ -8,6 +8,7 @@ import {
   updateAnnotationAsync,
   deleteAnnotationAsync,
 } from 'src/shared/actions/annotations'
+import {notify} from 'src/shared/actions/notifications'
 
 import {Annotation} from 'src/types'
 
@@ -16,6 +17,7 @@ interface Props {
   onSetEditingAnnotation: typeof setEditingAnnotation
   onDeleteAnnotation: typeof deleteAnnotationAsync
   onSaveAnnotation: typeof updateAnnotationAsync
+  onNotify: typeof notify
 }
 
 class AnnotationEditorContainer extends PureComponent<Props> {
@@ -56,13 +58,28 @@ class AnnotationEditorContainer extends PureComponent<Props> {
   }
 
   private handleSave = async (a: Annotation): Promise<void> => {
-    const {onSaveAnnotation, onSetEditingAnnotation} = this.props
+    const {onSaveAnnotation, onSetEditingAnnotation, onNotify} = this.props
 
-    await onSaveAnnotation(a)
+    try {
+      await onSaveAnnotation(a)
 
-    onSetEditingAnnotation(null)
+      onSetEditingAnnotation(null)
+    } catch (e) {
+      let errorMessage = 'unknown error'
 
-    return
+      if (e.status && e.status === 404) {
+        errorMessage = 'annotation not found'
+      } else if (e.status && e.status === 422) {
+        errorMessage = 'could not process annotation'
+      }
+
+      onNotify({
+        type: 'error',
+        icon: 'alert-triangle',
+        duration: 1000 * 10,
+        message: `Could not save annotation: ${errorMessage}`,
+      })
+    }
   }
 }
 
@@ -76,6 +93,7 @@ const mdtp = {
   onSaveAnnotation: updateAnnotationAsync,
   onSetEditingAnnotation: setEditingAnnotation,
   onDeleteAnnotation: deleteAnnotationAsync,
+  onNotify: notify,
 }
 
 export default connect(mstp, mdtp)(AnnotationEditorContainer)

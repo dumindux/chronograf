@@ -2,6 +2,10 @@
   justify-content: space-between;
 }
 
+.annotation-editor .row {
+  margin-bottom: 5px;
+}
+
 .annotation-editor--controls {
   display: flex;
 
@@ -16,7 +20,7 @@
 
 .annotation-editor-body--delete {
   width: 65px;
-  margin: 15px auto 0 auto;
+  margin: 25px auto 0 auto;
 }
 
 .annotation-editor-body label {
@@ -25,5 +29,54 @@
 
   .error {
     color: $c-curacao;
+  }
+}
+
+.annotation-tag-editor {
+  margin-top: 2px;
+}
+
+.annotation-tag-editor .annotation-tag-editor--add {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.annotation-tag-editor .tag-control {
+  margin-bottom: 8px;
+}
+
+.tag-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tag-control--equals {
+  flex: 0 0 auto;
+  padding: 3px 5px 0 5px;
+  height: $form-sm-height;
+  margin: 0 5px;
+  font-family: $code-font;
+  font-weight: 500;
+  color: $g14-chromium;
+  background-color: $g5-pepper;
+  border-radius: 3px;
+  user-select: none;
+}
+
+.tag-control--key {
+  flex: 1 1 40%;
+}
+
+.tag-control--value {
+  flex: 1 1 60%;
+}
+
+.tag-control .tag-control--remove {
+  flex: 0 0 auto;
+  margin-left: 5px;
+
+  .icon {
+    margin: 0;
   }
 }
