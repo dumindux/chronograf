@@ -144,12 +144,15 @@ class TagFilterControl extends PureComponent<Props, State> {
   }
 
   private save = (): void => {
-    const {onUpdate, tagFilter} = this.props
+    const {onUpdate, onDelete, tagFilter} = this.props
     const {tagKey, filterType, tagValue} = this.state
 
-    onUpdate({id: tagFilter.id, tagKey, filterType, tagValue})
-
-    this.setState({draftState: 'DEFAULT'})
+    if (tagKey === '') {
+      onDelete(tagFilter)
+    } else {
+      onUpdate({id: tagFilter.id, tagKey, filterType, tagValue})
+      this.setState({draftState: 'DEFAULT'})
+    }
   }
 
   private handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
