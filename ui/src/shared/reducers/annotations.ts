@@ -47,11 +47,10 @@ const initialState = {
       },
     },
   },
-  editingAnnotation: '49ee1a85-a51a-4fea-9d2d-b9d692d2b41d',
   tagKeys: null,
   tagValues: {},
   tagFilters: {
-    18: {
+    1: {
       a: {
         id: 'a',
         tagKey: 'foo',

@@ -7,7 +7,7 @@ import {NEW_TAG_FILTER} from 'src/shared/annotations/helpers'
 import {TagFilter} from 'src/types/annotations'
 
 interface Props {
-  onCreate: (t: TagFilter) => void
+  onCreate: (t: TagFilter) => Promise<void>
 }
 
 interface State {
@@ -50,7 +50,7 @@ class NewTagFilterToggle extends PureComponent<Props, State> {
     this.setState({isAdding: true})
   }
 
-  private handleCreate = (t: TagFilter) => {
+  private handleCreate = async (t: TagFilter) => {
     const {onCreate} = this.props
 
     onCreate(t)
@@ -58,7 +58,7 @@ class NewTagFilterToggle extends PureComponent<Props, State> {
     this.setState({isAdding: false})
   }
 
-  private handleDiscard = () => {
+  private handleDiscard = async (): Promise<void> => {
     this.setState({isAdding: false})
   }
 }

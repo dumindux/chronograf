@@ -1,7 +1,8 @@
-import React, {PureComponent, KeyboardEvent, ChangeEvent} from 'react'
+import React, {PureComponent} from 'react'
 
 import Debouncer from 'src/shared/utils/debouncer'
 import {FILTER_TYPES} from 'src/shared/annotations/helpers'
+import SuggestionInput from 'src/shared/components/SuggestionInput'
 
 import {TagFilter, TagFilterType} from 'src/types/annotations'
 
@@ -13,8 +14,8 @@ type DraftState = 'SAVING' | 'EDITING' | 'DEFAULT'
 interface Props {
   tagFilter: TagFilter
   autoFocus?: boolean
-  onUpdate: (t: TagFilter) => void
-  onDelete: (t: TagFilter) => void
+  onUpdate: (t: TagFilter) => Promise<void>
+  onDelete: (t: TagFilter) => Promise<void>
   onGetKeySuggestions?: () => Promise<string[]>
   onGetValueSuggestions?: (key: string) => Promise<string[]>
 }
@@ -29,7 +30,6 @@ interface State {
 }
 
 class TagFilterControl extends PureComponent<Props, State> {
-  private tagKeyInput: React.RefObject<HTMLInputElement>
   private debouncer: Debouncer
 
   constructor(props) {
@@ -46,29 +46,30 @@ class TagFilterControl extends PureComponent<Props, State> {
       draftState: 'DEFAULT',
     }
 
-    this.tagKeyInput = React.createRef<HTMLInputElement>()
     this.debouncer = new Debouncer()
   }
 
-  public componentDidMount() {
-    if (this.props.autoFocus) {
-      this.tagKeyInput.current.focus()
-    }
-  }
-
   public render() {
-    const {tagKey, tagValue, filterType} = this.state
+    const {autoFocus} = this.props
+    const {
+      tagKey,
+      tagValue,
+      filterType,
+      keySuggestions,
+      valueSuggestions,
+    } = this.state
 
     return (
       <div className="annotation-tag-filter">
         <div className="annotation-tag-filter--tag-key">
-          <input
-            ref={this.tagKeyInput}
-            className="form-control input-xs"
+          <SuggestionInput
             value={tagKey}
+            inputClass="input-xs"
             onChange={this.handleTagKeyChange}
             onFocus={this.handleTagKeyFocus}
-            onKeyPress={this.handleKeyPress}
+            onSelect={this.handleSelectTagKey}
+            suggestions={keySuggestions}
+            autoFocus={autoFocus}
           />
         </div>
         <div
@@ -78,12 +79,13 @@ class TagFilterControl extends PureComponent<Props, State> {
           {filterType}
         </div>
         <div className="annotation-tag-filter--tag-value">
-          <input
-            className="form-control input-xs"
+          <SuggestionInput
             value={tagValue}
+            inputClass="input-xs"
             onChange={this.handleTagValueChange}
             onFocus={this.handleTagValueFocus}
-            onKeyPress={this.handleKeyPress}
+            onSelect={this.handleSelectTagValue}
+            suggestions={valueSuggestions}
           />
         </div>
         {this.renderIcon()}
@@ -95,7 +97,7 @@ class TagFilterControl extends PureComponent<Props, State> {
     const {draftState} = this.state
 
     if (draftState === 'SAVING') {
-      // TODO: Spinner
+      return <div className="annotation-tag-filter--loading" />
     } else if (draftState === 'EDITING') {
       return (
         <div className="btn btn-xs btn-default" onClick={this.save}>
@@ -132,6 +134,8 @@ class TagFilterControl extends PureComponent<Props, State> {
   private handleDelete = (): void => {
     const {onDelete, tagFilter} = this.props
 
+    this.setState({draftState: 'SAVING'})
+
     onDelete(tagFilter)
   }
 
@@ -143,30 +147,34 @@ class TagFilterControl extends PureComponent<Props, State> {
     this.debouncer.call(this.save, TOGGLE_FILTER_DEBOUNCE_DELAY)
   }
 
-  private save = (): void => {
+  private save = async (): Promise<void> => {
     const {onUpdate, onDelete, tagFilter} = this.props
     const {tagKey, filterType, tagValue} = this.state
+
+    this.setState({draftState: 'SAVING'})
 
     if (tagKey === '') {
       onDelete(tagFilter)
     } else {
-      onUpdate({id: tagFilter.id, tagKey, filterType, tagValue})
+      await onUpdate({id: tagFilter.id, tagKey, filterType, tagValue})
       this.setState({draftState: 'DEFAULT'})
     }
   }
 
-  private handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
-    if (e.key == 'Enter') {
-      this.save()
-    }
+  private handleSelectTagKey = (tagKey: string): void => {
+    this.setState({tagKey}, this.save)
   }
 
-  private handleTagKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
-    this.setState({tagKey: e.target.value})
+  private handleSelectTagValue = (tagKey: string): void => {
+    this.setState({tagKey}, this.save)
   }
 
-  private handleTagValueChange = (e: ChangeEvent<HTMLInputElement>) => {
-    this.setState({tagValue: e.target.value})
+  private handleTagKeyChange = (tagKey: string): void => {
+    this.setState({tagKey})
+  }
+
+  private handleTagValueChange = (tagValue: string) => {
+    this.setState({tagValue})
   }
 }
 

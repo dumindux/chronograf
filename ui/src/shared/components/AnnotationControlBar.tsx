@@ -52,25 +52,25 @@ class AnnotationControlBar extends PureComponent<Props> {
     )
   }
 
-  public handleCreateTagFilter = (t: TagFilter): void => {
+  public handleCreateTagFilter = async (t: TagFilter): Promise<void> => {
     const {dashboardId, onCreateTagFilter, onRefreshAnnotations} = this.props
 
     onCreateTagFilter(dashboardId, t)
-    onRefreshAnnotations()
+    await onRefreshAnnotations()
   }
 
-  public handleUpdateTagFilter = (t: TagFilter): void => {
+  public handleUpdateTagFilter = async (t: TagFilter): Promise<void> => {
     const {dashboardId, onUpdateTagFilter, onRefreshAnnotations} = this.props
 
     onUpdateTagFilter(dashboardId, t)
-    onRefreshAnnotations()
+    await onRefreshAnnotations()
   }
 
-  public handleDeleteTagFilter = (t: TagFilter): void => {
+  public handleDeleteTagFilter = async (t: TagFilter): Promise<void> => {
     const {dashboardId, onDeleteTagFilter, onRefreshAnnotations} = this.props
 
     onDeleteTagFilter(dashboardId, t)
-    onRefreshAnnotations()
+    await onRefreshAnnotations()
   }
 }
 
