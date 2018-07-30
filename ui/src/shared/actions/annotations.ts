@@ -282,6 +282,7 @@ export const getAnnotationsAsync: GetAnnotationsDispatcher = (
 ): GetAnnotationsThunk => async (
   dispatch: Dispatch<SetAnnotationsAction>
 ): Promise<void> => {
+  // TODO: Query for annotations based on current tag filters
   const annotations = await getAnnotations(indexUrl, since, until)
 
   dispatch(setAnnotations(annotations))

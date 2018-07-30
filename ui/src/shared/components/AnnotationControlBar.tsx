@@ -22,6 +22,7 @@ interface Props {
   onCreateTagFilter: typeof createTagFilter
   onUpdateTagFilter: typeof updateTagFilter
   onDeleteTagFilter: typeof deleteTagFilter
+  onRefreshAnnotations: () => Promise<void>
 }
 
 class AnnotationControlBar extends PureComponent<Props> {
@@ -52,21 +53,24 @@ class AnnotationControlBar extends PureComponent<Props> {
   }
 
   public handleCreateTagFilter = (t: TagFilter): void => {
-    const {dashboardId, onCreateTagFilter} = this.props
+    const {dashboardId, onCreateTagFilter, onRefreshAnnotations} = this.props
 
     onCreateTagFilter(dashboardId, t)
+    onRefreshAnnotations()
   }
 
   public handleUpdateTagFilter = (t: TagFilter): void => {
-    const {dashboardId, onUpdateTagFilter} = this.props
+    const {dashboardId, onUpdateTagFilter, onRefreshAnnotations} = this.props
 
     onUpdateTagFilter(dashboardId, t)
+    onRefreshAnnotations()
   }
 
   public handleDeleteTagFilter = (t: TagFilter): void => {
-    const {dashboardId, onDeleteTagFilter} = this.props
+    const {dashboardId, onDeleteTagFilter, onRefreshAnnotations} = this.props
 
     onDeleteTagFilter(dashboardId, t)
+    onRefreshAnnotations()
   }
 }
 

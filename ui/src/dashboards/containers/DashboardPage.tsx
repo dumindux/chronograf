@@ -146,10 +146,10 @@ class DashboardPage extends Component<Props, State> {
     this.getDashboardLinks()
   }
 
-  public fetchAnnotations = () => {
+  public fetchAnnotations = async () => {
     const {source, timeRange, getAnnotationsAsync} = this.props
     const rangeMs = millisecondTimeRange(timeRange)
-    getAnnotationsAsync(source.links.annotations, rangeMs)
+    await getAnnotationsAsync(source.links.annotations, rangeMs)
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -304,7 +304,10 @@ class DashboardPage extends Component<Props, State> {
                 onPickTemplate={this.handlePickTemplate}
                 source={source}
               />
-              <AnnotationControlBar dashboardId={dashboardID} />
+              <AnnotationControlBar
+                dashboardId={dashboardID}
+                onRefreshAnnotations={this.fetchAnnotations}
+              />
             </>
           )}
         {dashboard ? (
@@ -584,7 +587,6 @@ const mdtp = {
   handleDismissEditingAnnotation: annotationActions.dismissEditingAnnotation,
 }
 
-export default connect(
-  mstp,
-  mdtp
-)(ManualRefresh<Props>(withRouter<Props>(DashboardPage)))
+export default connect(mstp, mdtp)(
+  ManualRefresh<Props>(withRouter<Props>(DashboardPage))
+)
