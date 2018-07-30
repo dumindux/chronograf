@@ -84,7 +84,7 @@ const mstp = (state, props) => {
 
   const annotations = visibleAnnotations(
     props.xAxisRange,
-    getSelectedAnnotations(state, props)
+    getSelectedAnnotations(state)
   )
 
   return {

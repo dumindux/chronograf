@@ -9,7 +9,6 @@ const getAnnotationsById = (state: {annotations: AnnotationState}) =>
 export const getSelectedAnnotations = createSelector(
   getAnnotationsById,
   annotationsById => {
-    // TODO: Filter by tagFilters from state
     return Object.values<Annotation>(annotationsById).filter(a => !!a)
   }
 )

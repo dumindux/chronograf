@@ -16,7 +16,10 @@ import AnnotationEditorContainer from 'src/shared/components/AnnotationEditorCon
 
 // Actions
 import * as dashboardActions from 'src/dashboards/actions'
-import * as annotationActions from 'src/shared/actions/annotations'
+import {
+  getAnnotationsAsync,
+  dismissEditingAnnotation,
+} from 'src/shared/actions/annotations'
 import * as cellEditorOverlayActions from 'src/dashboards/actions/cellEditorOverlay'
 import * as appActions from 'src/shared/actions/app'
 import * as errorActions from 'src/shared/actions/errors'
@@ -47,7 +50,6 @@ import {WithRouterProps} from 'react-router'
 import {ManualRefreshProps} from 'src/shared/components/ManualRefresh'
 import {Location} from 'history'
 import {InjectedRouter} from 'react-router'
-import * as AnnotationsActions from 'src/types/actions/annotations'
 import * as AppActions from 'src/types/actions/app'
 import * as ColorsModels from 'src/types/colors'
 import * as DashboardsModels from 'src/types/dashboards'
@@ -83,10 +85,10 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   isUsingAuth: boolean
   router: InjectedRouter
   notify: NotificationsActions.PublishNotificationActionCreator
-  getAnnotationsAsync: AnnotationsActions.GetAnnotationsDispatcher
+  getAnnotationsAsync: typeof getAnnotationsAsync
   handleShowCellEditorOverlay: typeof cellEditorOverlayActions.showCellEditorOverlay
   handleHideCellEditorOverlay: typeof cellEditorOverlayActions.hideCellEditorOverlay
-  handleDismissEditingAnnotation: typeof annotationActions.dismissEditingAnnotation
+  handleDismissEditingAnnotation: typeof dismissEditingAnnotation
   selectedCell: DashboardsModels.Cell
   thresholdsListType: string
   thresholdsListColors: ColorsModels.ColorNumber[]
@@ -583,8 +585,8 @@ const mdtp = {
   notify: notifyActions.notify,
   handleShowCellEditorOverlay: cellEditorOverlayActions.showCellEditorOverlay,
   handleHideCellEditorOverlay: cellEditorOverlayActions.hideCellEditorOverlay,
-  getAnnotationsAsync: annotationActions.getAnnotationsAsync,
-  handleDismissEditingAnnotation: annotationActions.dismissEditingAnnotation,
+  getAnnotationsAsync,
+  handleDismissEditingAnnotation: dismissEditingAnnotation,
 }
 
 export default connect(mstp, mdtp)(

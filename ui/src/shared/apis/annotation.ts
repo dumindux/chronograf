@@ -11,7 +11,7 @@ interface ServerAnnotation {
   startTime: string
   endTime: string
   text: string
-  labels?: string[]
+  tags?: {[tagKey: string]: string}
   links: {self: string}
 }
 
