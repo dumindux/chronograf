@@ -125,12 +125,14 @@ const annotationsReducer = (
       return newState
     }
 
-    case 'LOAD_ANNOTATIONS': {
-      const annotations = {...state.annotations}
-
-      for (const annotation of action.payload.annotations) {
-        annotations[annotation.id] = annotation
-      }
+    case 'SET_ANNOTATIONS': {
+      const annotations = action.payload.annotations.reduce(
+        (acc, a) => ({
+          ...acc,
+          [a.id]: a,
+        }),
+        {}
+      )
 
       return {
         ...state,

@@ -13,7 +13,7 @@ export type Action =
   | DismissAddingAnnotationAction
   | MouseEnterTempAnnotationAction
   | MouseLeaveTempAnnotationAction
-  | LoadAnnotationsAction
+  | SetAnnotationsAction
   | UpdateAnnotationAction
   | SetAddingAnnotationAction
   | DeleteAnnotationAction
@@ -82,17 +82,17 @@ export const mouseLeaveTempAnnotation = (): MouseLeaveTempAnnotationAction => ({
   type: 'MOUSELEAVE_TEMP_ANNOTATION',
 })
 
-interface LoadAnnotationsAction {
-  type: 'LOAD_ANNOTATIONS'
+interface SetAnnotationsAction {
+  type: 'SET_ANNOTATIONS'
   payload: {
     annotations: Annotation[]
   }
 }
 
-export const loadAnnotations = (
+export const setAnnotations = (
   annotations: Annotation[]
-): LoadAnnotationsAction => ({
-  type: 'LOAD_ANNOTATIONS',
+): SetAnnotationsAction => ({
+  type: 'SET_ANNOTATIONS',
   payload: {
     annotations,
   },
@@ -197,7 +197,7 @@ interface UpdateTagFilterAction {
 
 export const updateTagFilter = (
   dashboardId: number,
-  tagFilter: TagFilter,
+  tagFilter: TagFilter
 ): UpdateTagFilterAction => ({
   type: 'UPDATE_TAG_FILTER',
   payload: {dashboardId, tagFilter},
@@ -273,18 +273,18 @@ export type GetAnnotationsDispatcher = (
 ) => GetAnnotationsThunk
 
 export type GetAnnotationsThunk = (
-  dispatch: Dispatch<LoadAnnotationsAction>
+  dispatch: Dispatch<SetAnnotationsAction>
 ) => Promise<void>
 
 export const getAnnotationsAsync: GetAnnotationsDispatcher = (
   indexUrl: string,
   {since, until}: AnnotationRange
 ): GetAnnotationsThunk => async (
-  dispatch: Dispatch<LoadAnnotationsAction>
+  dispatch: Dispatch<SetAnnotationsAction>
 ): Promise<void> => {
   const annotations = await getAnnotations(indexUrl, since, until)
 
-  dispatch(loadAnnotations(annotations))
+  dispatch(setAnnotations(annotations))
 }
 
 export const deleteAnnotationAsync = (
