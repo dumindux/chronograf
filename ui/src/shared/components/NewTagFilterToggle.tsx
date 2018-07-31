@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 
-import TagFilterControl from 'src/shared/components/TagFilterControl'
+import AnnotationFilterControl from 'src/shared/components/AnnotationFilterControl'
 
 import {NEW_TAG_FILTER} from 'src/shared/annotations/helpers'
 
@@ -27,7 +27,7 @@ class NewTagFilterToggle extends PureComponent<Props, State> {
     return (
       <>
         {isAdding && (
-          <TagFilterControl
+          <AnnotationFilterControl
             tagFilter={NEW_TAG_FILTER()}
             autoFocus={true}
             onUpdate={this.handleCreate}

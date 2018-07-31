@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 
 import AddAnnotationToggle from 'src/shared/components/AddAnnotationToggle'
-import TagFilterControl from 'src/shared/components/TagFilterControl'
+import AnnotationFilterControl from 'src/shared/components/AnnotationFilterControl'
 import NewTagFilterToggle from 'src/shared/components/NewTagFilterToggle'
 
 import {
@@ -34,7 +34,7 @@ class AnnotationControlBar extends PureComponent<Props> {
         <div className="annotation-control-bar--lhs">
           <div className="toolbar-title">Filter Annotations by Tags:</div>
           {tagFilters.map(tagFilter => (
-            <TagFilterControl
+            <AnnotationFilterControl
               key={tagFilter.id}
               tagFilter={tagFilter}
               onUpdate={this.handleUpdateTagFilter}

@@ -20,7 +20,7 @@ interface State {
 
 const NUM_SUGGESTIONS = 8
 
-class SuggestionInput extends PureComponent<Props, State> {
+class AnnotationFilterControlInput extends PureComponent<Props, State> {
   private input: React.RefObject<HTMLInputElement>
 
   constructor(props) {
@@ -165,4 +165,4 @@ class SuggestionInput extends PureComponent<Props, State> {
   }
 }
 
-export default SuggestionInput
+export default AnnotationFilterControlInput

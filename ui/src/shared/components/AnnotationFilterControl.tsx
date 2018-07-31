@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 
 import Debouncer from 'src/shared/utils/debouncer'
 import {FILTER_TYPES} from 'src/shared/annotations/helpers'
-import SuggestionInput from 'src/shared/components/SuggestionInput'
+import AnnotationFilterControlInput from 'src/shared/components/AnnotationFilterControlInput'
 
 import {TagFilter, TagFilterType} from 'src/types/annotations'
 
@@ -29,7 +29,7 @@ interface State {
   draftState: DraftState
 }
 
-class TagFilterControl extends PureComponent<Props, State> {
+class AnnotationFilterControl extends PureComponent<Props, State> {
   private debouncer: Debouncer
 
   constructor(props) {
@@ -60,9 +60,9 @@ class TagFilterControl extends PureComponent<Props, State> {
     } = this.state
 
     return (
-      <div className="annotation-tag-filter">
-        <div className="annotation-tag-filter--tag-key">
-          <SuggestionInput
+      <div className="annotation-filter-control">
+        <div className="annotation-filter-control--tag-key">
+          <AnnotationFilterControlInput
             value={tagKey}
             inputClass="input-xs"
             onChange={this.handleTagKeyChange}
@@ -73,13 +73,13 @@ class TagFilterControl extends PureComponent<Props, State> {
           />
         </div>
         <div
-          className="annotation-tag-filter--filter-type"
+          className="annotation-filter-control--filter-type"
           onClick={this.toggleFilterType}
         >
           {filterType}
         </div>
-        <div className="annotation-tag-filter--tag-value">
-          <SuggestionInput
+        <div className="annotation-filter-control--tag-value">
+          <AnnotationFilterControlInput
             value={tagValue}
             inputClass="input-xs"
             onChange={this.handleTagValueChange}
@@ -97,7 +97,7 @@ class TagFilterControl extends PureComponent<Props, State> {
     const {draftState} = this.state
 
     if (draftState === 'SAVING') {
-      return <div className="annotation-tag-filter--loading" />
+      return <div className="annotation-filter-control--loading" />
     } else if (draftState === 'EDITING') {
       return (
         <div className="btn btn-xs btn-default" onClick={this.save}>
@@ -178,4 +178,4 @@ class TagFilterControl extends PureComponent<Props, State> {
   }
 }
 
-export default TagFilterControl
+export default AnnotationFilterControl
