@@ -142,7 +142,10 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
   private toggleFilterType = (): void => {
     const {filterType} = this.state
 
-    this.setState({filterType: nextItem(FILTER_TYPES, filterType)})
+    this.setState({
+      filterType: nextItem(FILTER_TYPES, filterType),
+      draftState: 'SAVING',
+    })
 
     this.debouncer.call(this.save, TOGGLE_FILTER_DEBOUNCE_DELAY)
   }
