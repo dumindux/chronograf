@@ -29,8 +29,10 @@ interface Props {
   onManualRefresh: () => void
   handleClickPresentationButton: AppActions.DelayEnablePresentationModeDispatcher
   onAddCell: () => void
-  onToggleShowToolbars?: () => void
-  showToolbars?: boolean
+  showTempVarControls?: boolean
+  onToggleShowTempVarControls?: () => void
+  showAnnotationControls: boolean
+  onToggleShowAnnotationControls?: () => void
   zoomedTimeRange: QueriesModels.TimeRange
   onRenameDashboard: (name: string) => Promise<void>
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
@@ -151,18 +153,34 @@ class DashboardHeader extends Component<Props, State> {
   }
 
   private get toolsButton(): JSX.Element {
-    const {dashboard, showToolbars, onToggleShowToolbars} = this.props
+    const {
+      dashboard,
+      showTempVarControls,
+      onToggleShowTempVarControls,
+      showAnnotationControls,
+      onToggleShowAnnotationControls,
+    } = this.props
 
     if (dashboard) {
       return (
-        <div
-          className={classnames('btn btn-default btn-sm', {
-            active: showToolbars,
-          })}
-          onClick={onToggleShowToolbars}
-        >
-          <span className="icon cube" />Tools
-        </div>
+        <>
+          <div
+            className={classnames('btn btn-default btn-sm', {
+              active: showTempVarControls,
+            })}
+            onClick={onToggleShowTempVarControls}
+          >
+            <span className="icon cube" />Template Variables
+          </div>
+          <div
+            className={classnames('btn btn-default btn-sm', {
+              active: showAnnotationControls,
+            })}
+            onClick={onToggleShowAnnotationControls}
+          >
+            <span className="icon pencil" />Annotations
+          </div>
+        </>
       )
     }
   }

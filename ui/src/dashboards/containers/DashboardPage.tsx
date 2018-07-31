@@ -117,7 +117,8 @@ interface State {
   windowHeight: number
   selectedCell: DashboardsModels.Cell | null
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
-  showToolbars: boolean
+  showTempVarControls: boolean
+  showAnnotationControls: boolean
 }
 
 @ErrorHandling
@@ -130,7 +131,8 @@ class DashboardPage extends Component<Props, State> {
       selectedCell: null,
       windowHeight: window.innerHeight,
       dashboardLinks: EMPTY_LINKS,
-      showToolbars: true,
+      showAnnotationControls: false,
+      showTempVarControls: false,
     }
   }
 
@@ -255,7 +257,11 @@ class DashboardPage extends Component<Props, State> {
       templatesIncludingDashTime = []
     }
 
-    const {dashboardLinks, showToolbars} = this.state
+    const {
+      dashboardLinks,
+      showTempVarControls,
+      showAnnotationControls,
+    } = this.state
 
     return (
       <div className="page dashboard-page">
@@ -289,28 +295,31 @@ class DashboardPage extends Component<Props, State> {
           onRenameDashboard={this.handleRenameDashboard}
           dashboardLinks={dashboardLinks}
           activeDashboard={dashboard ? dashboard.name : ''}
-          showToolbars={showToolbars}
+          showAnnotationControls={showAnnotationControls}
+          showTempVarControls={showTempVarControls}
           handleChooseAutoRefresh={handleChooseAutoRefresh}
           handleChooseTimeRange={this.handleChooseTimeRange}
-          onToggleShowToolbars={this.handleToggleShowToolbars}
+          onToggleShowTempVarControls={this.toggleTempVarControls}
+          onToggleShowAnnotationControls={this.toggleAnnotationControls}
           handleClickPresentationButton={handleClickPresentationButton}
         />
         {!inPresentationMode &&
-          showToolbars && (
-            <>
-              <TemplateControlBar
-                templates={dashboard && dashboard.templates}
-                meRole={meRole}
-                isUsingAuth={isUsingAuth}
-                onSaveTemplates={this.handleSaveTemplateVariables}
-                onPickTemplate={this.handlePickTemplate}
-                source={source}
-              />
-              <AnnotationControlBar
-                dashboardId={dashboardID}
-                onRefreshAnnotations={this.fetchAnnotations}
-              />
-            </>
+          showTempVarControls && (
+            <TemplateControlBar
+              templates={dashboard && dashboard.templates}
+              meRole={meRole}
+              isUsingAuth={isUsingAuth}
+              onSaveTemplates={this.handleSaveTemplateVariables}
+              onPickTemplate={this.handlePickTemplate}
+              source={source}
+            />
+          )}
+        {!inPresentationMode &&
+          showAnnotationControls && (
+            <AnnotationControlBar
+              dashboardId={dashboardID}
+              onRefreshAnnotations={this.fetchAnnotations}
+            />
           )}
         {dashboard ? (
           <Dashboard
@@ -472,8 +481,12 @@ class DashboardPage extends Component<Props, State> {
     }
   }
 
-  private handleToggleShowToolbars = (): void => {
-    this.setState({showToolbars: !this.state.showToolbars})
+  private toggleTempVarControls = () => {
+    this.setState({showTempVarControls: !this.state.showTempVarControls})
+  }
+
+  private toggleAnnotationControls = () => {
+    this.setState({showAnnotationControls: !this.state.showAnnotationControls})
   }
 
   private handleZoomedTimeRange = (
