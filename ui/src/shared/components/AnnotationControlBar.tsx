@@ -9,6 +9,8 @@ import {
   createTagFilter,
   updateTagFilter,
   deleteTagFilter,
+  fetchAndSetTagKeys,
+  fetchAndSetTagValues,
 } from 'src/shared/actions/annotations'
 
 import {getTagFilters} from 'src/shared/selectors/annotations'
@@ -19,10 +21,16 @@ import {AnnotationState} from 'src/shared/reducers/annotations'
 interface Props {
   dashboardId: number
   tagFilters: TagFilter[]
+  tagKeys?: string[]
+  tagValues: {
+    [tagKey: string]: string[]
+  }
   onCreateTagFilter: typeof createTagFilter
   onUpdateTagFilter: typeof updateTagFilter
   onDeleteTagFilter: typeof deleteTagFilter
   onRefreshAnnotations: () => Promise<void>
+  onGetTagKeys: typeof fetchAndSetTagKeys
+  onGetTagValues: typeof fetchAndSetTagValues
 }
 
 class AnnotationControlBar extends PureComponent<Props> {
@@ -39,11 +47,15 @@ class AnnotationControlBar extends PureComponent<Props> {
               tagFilter={tagFilter}
               onUpdate={this.handleUpdateTagFilter}
               onDelete={this.handleDeleteTagFilter}
-              onGetKeySuggestions={() => Promise.resolve([])}
-              onGetValueSuggestions={() => Promise.resolve([])}
+              onGetKeySuggestions={this.handleGetKeySuggestions}
+              onGetValueSuggestions={this.handleGetValueSuggestions}
             />
           ))}
-          <NewTagFilterToggle onCreate={this.handleCreateTagFilter} />
+          <NewTagFilterToggle
+            onCreate={this.handleCreateTagFilter}
+            onGetKeySuggestions={this.handleGetKeySuggestions}
+            onGetValueSuggestions={this.handleGetValueSuggestions}
+          />
         </div>
         <div className="annotation-control-bar--rhs">
           <AddAnnotationToggle />
@@ -52,25 +64,51 @@ class AnnotationControlBar extends PureComponent<Props> {
     )
   }
 
-  public handleCreateTagFilter = async (t: TagFilter): Promise<void> => {
+  private handleCreateTagFilter = async (t: TagFilter): Promise<void> => {
     const {dashboardId, onCreateTagFilter, onRefreshAnnotations} = this.props
 
     onCreateTagFilter(dashboardId, t)
     await onRefreshAnnotations()
   }
 
-  public handleUpdateTagFilter = async (t: TagFilter): Promise<void> => {
+  private handleUpdateTagFilter = async (t: TagFilter): Promise<void> => {
     const {dashboardId, onUpdateTagFilter, onRefreshAnnotations} = this.props
 
     onUpdateTagFilter(dashboardId, t)
     await onRefreshAnnotations()
   }
 
-  public handleDeleteTagFilter = async (t: TagFilter): Promise<void> => {
+  private handleDeleteTagFilter = async (t: TagFilter): Promise<void> => {
     const {dashboardId, onDeleteTagFilter, onRefreshAnnotations} = this.props
 
     onDeleteTagFilter(dashboardId, t)
     await onRefreshAnnotations()
+  }
+
+  private handleGetKeySuggestions = async (): Promise<string[]> => {
+    const {tagKeys, onGetTagKeys} = this.props
+
+    if (!!tagKeys) {
+      return tagKeys
+    }
+
+    await onGetTagKeys()
+
+    return this.props.tagKeys
+  }
+
+  private handleGetValueSuggestions = async (
+    tagKey: string
+  ): Promise<string[]> => {
+    const {tagValues, onGetTagValues} = this.props
+
+    if (!!tagValues[tagKey]) {
+      return tagValues[tagKey]
+    }
+
+    await onGetTagValues(tagKey)
+
+    return this.props.tagValues[tagKey]
   }
 }
 
@@ -78,15 +116,18 @@ const mstp = (
   state: {annotations: AnnotationState},
   ownProps: {dashboardId: number}
 ): Partial<Props> => {
-  return {
-    tagFilters: getTagFilters(state, ownProps.dashboardId),
-  }
+  const {tagKeys, tagValues} = state.annotations
+  const tagFilters = getTagFilters(state, ownProps.dashboardId)
+
+  return {tagFilters, tagKeys, tagValues}
 }
 
 const mdtp = {
   onCreateTagFilter: createTagFilter,
   onUpdateTagFilter: updateTagFilter,
   onDeleteTagFilter: deleteTagFilter,
+  onGetTagKeys: fetchAndSetTagKeys,
+  onGetTagValues: fetchAndSetTagValues,
 }
 
 export default connect(mstp, mdtp)(AnnotationControlBar)

@@ -8,6 +8,8 @@ import {TagFilter} from 'src/types/annotations'
 
 interface Props {
   onCreate: (t: TagFilter) => Promise<void>
+  onGetKeySuggestions: () => Promise<string[]>
+  onGetValueSuggestions: (key: string) => Promise<string[]>
 }
 
 interface State {
@@ -22,6 +24,7 @@ class NewTagFilterToggle extends PureComponent<Props, State> {
   }
 
   public render() {
+    const {onGetKeySuggestions, onGetValueSuggestions} = this.props
     const {isAdding} = this.state
 
     return (
@@ -32,8 +35,8 @@ class NewTagFilterToggle extends PureComponent<Props, State> {
             autoFocus={true}
             onUpdate={this.handleCreate}
             onDelete={this.handleDiscard}
-            onGetKeySuggestions={() => Promise.resolve([])}
-            onGetValueSuggestions={() => Promise.resolve([])}
+            onGetKeySuggestions={onGetKeySuggestions}
+            onGetValueSuggestions={onGetValueSuggestions}
           />
         )}
         <button

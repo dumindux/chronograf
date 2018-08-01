@@ -16,8 +16,8 @@ interface Props {
   autoFocus?: boolean
   onUpdate: (t: TagFilter) => Promise<void>
   onDelete: (t: TagFilter) => Promise<void>
-  onGetKeySuggestions?: () => Promise<string[]>
-  onGetValueSuggestions?: (key: string) => Promise<string[]>
+  onGetKeySuggestions: () => Promise<string[]>
+  onGetValueSuggestions: (key: string) => Promise<string[]>
 }
 
 interface State {
@@ -86,6 +86,7 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
             onFocus={this.handleTagValueFocus}
             onSelect={this.handleSelectTagValue}
             suggestions={valueSuggestions}
+            autoFocus={false}
           />
         </div>
         {this.renderIcon()}
@@ -168,8 +169,8 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
     this.setState({tagKey}, this.save)
   }
 
-  private handleSelectTagValue = (tagKey: string): void => {
-    this.setState({tagKey}, this.save)
+  private handleSelectTagValue = (tagValue: string): void => {
+    this.setState({tagValue}, this.save)
   }
 
   private handleTagKeyChange = (tagKey: string): void => {

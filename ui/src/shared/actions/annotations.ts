@@ -303,15 +303,21 @@ export const updateAnnotationAsync = (
 }
 
 export const fetchAndSetTagKeys = () => async dispatch => {
-  // TODO: Fetch tag keys
-  const tagKeys = await Promise.resolve([])
+  // TODO: SHOW TAG KEYS ON chronograf FROM annotations
+  const tagKeys = await Promise.resolve(['dumpling', 'veggie', 'cereal'])
 
   dispatch(setTagKeys(tagKeys))
 }
 
 export const fetchAndSetTagValues = (tagKey: string) => async dispatch => {
-  // TODO: Fetch tag values
-  const tagValues = await Promise.resolve([])
+  // TODO: SHOW TAG VALUES ON chronograf FROM annotations WITH KEY tagKey
+  const tagValues = await Promise.resolve([
+    'empanada',
+    'gyoza',
+    'mandu',
+    'pierogi',
+    'samosa',
+  ])
 
   dispatch(setTagValues(tagKey, tagValues))
 }
