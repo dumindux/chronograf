@@ -9,7 +9,6 @@ import {
   deleteTagFilter,
   fetchAndSetTagKeys,
   fetchAndSetTagValues,
-  setAddingTagFilter,
 } from 'src/shared/actions/annotations'
 
 import {NEW_TAG_FILTER} from 'src/shared/annotations/helpers'
@@ -33,12 +32,11 @@ interface Props {
   onRefreshAnnotations: () => Promise<void>
   onGetTagKeys: typeof fetchAndSetTagKeys
   onGetTagValues: typeof fetchAndSetTagValues
-  onSetAddingTagFilter: typeof setAddingTagFilter
 }
 
 class AnnotationControlBar extends PureComponent<Props> {
   public render() {
-    const {tagFilters, addingTagFilter} = this.props
+    const {tagFilters} = this.props
 
     return (
       <div className="annotation-control-bar">
@@ -54,15 +52,6 @@ class AnnotationControlBar extends PureComponent<Props> {
               onGetValueSuggestions={this.handleGetValueSuggestions}
             />
           ))}
-          {addingTagFilter && (
-            <AnnotationFilterControl
-              tagFilter={addingTagFilter}
-              onUpdate={this.handleSaveNewTagFilter}
-              onDelete={this.handleDeleteTagFilter}
-              onGetKeySuggestions={this.handleGetKeySuggestions}
-              onGetValueSuggestions={this.handleGetValueSuggestions}
-            />
-          )}
           <button
             className="btn btn-sm btn-primary annotation-control-bar--add-filter"
             onClick={this.handleAddTagFilter}
@@ -78,22 +67,9 @@ class AnnotationControlBar extends PureComponent<Props> {
   }
 
   private handleAddTagFilter = () => {
-    const {onSetAddingTagFilter} = this.props
+    const {onUpdateTagFilter, dashboardId} = this.props
 
-    onSetAddingTagFilter(NEW_TAG_FILTER())
-  }
-
-  private handleSaveNewTagFilter = async (t: TagFilter) => {
-    const {
-      onSetAddingTagFilter,
-      onUpdateTagFilter,
-      onRefreshAnnotations,
-      dashboardId,
-    } = this.props
-
-    onUpdateTagFilter(dashboardId, t)
-    onSetAddingTagFilter(null)
-    onRefreshAnnotations()
+    onUpdateTagFilter(dashboardId, NEW_TAG_FILTER())
   }
 
   private handleUpdateTagFilter = async (t: TagFilter): Promise<void> => {
@@ -152,7 +128,6 @@ const mdtp = {
   onDeleteTagFilter: deleteTagFilter,
   onGetTagKeys: fetchAndSetTagKeys,
   onGetTagValues: fetchAndSetTagValues,
-  onSetAddingTagFilter: setAddingTagFilter,
 }
 
 export default connect(mstp, mdtp)(AnnotationControlBar)

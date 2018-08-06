@@ -9,7 +9,6 @@ interface Props {
   onSelect: (newValue: string) => void
   onFocus: () => void
   inputClass?: string
-  autoFocus: boolean
 }
 
 interface State {
@@ -21,12 +20,9 @@ interface State {
 const NUM_SUGGESTIONS = 8
 
 class AnnotationFilterControlInput extends PureComponent<Props, State> {
-  private input: React.RefObject<HTMLInputElement>
-
   constructor(props) {
     super(props)
 
-    this.input = React.createRef<HTMLInputElement>()
     this.state = {
       filteredSuggestions: props.suggestion,
       selectionIndex: 0,
@@ -47,12 +43,6 @@ class AnnotationFilterControlInput extends PureComponent<Props, State> {
     return {filteredSuggestions: unique}
   }
 
-  public componentDidMount() {
-    if (this.props.autoFocus) {
-      this.input.current.focus()
-    }
-  }
-
   public render() {
     const {value} = this.props
 
@@ -60,7 +50,6 @@ class AnnotationFilterControlInput extends PureComponent<Props, State> {
       <ClickOutside onClickOutside={this.handleClickOutside}>
         <div className="suggestion-input">
           <input
-            ref={this.input}
             className={this.inputClass}
             value={value}
             onChange={this.handleChange}

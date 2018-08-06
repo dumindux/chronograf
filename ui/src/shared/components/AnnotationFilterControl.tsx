@@ -1,19 +1,24 @@
 import React, {PureComponent} from 'react'
 
-import Debouncer from 'src/shared/utils/debouncer'
 import {FILTER_TYPES} from 'src/shared/annotations/helpers'
 import AnnotationFilterControlInput from 'src/shared/components/AnnotationFilterControlInput'
+import Button from 'src/reusable_ui/components/Button'
+import {
+  ButtonShape,
+  ComponentStatus,
+  ComponentColor,
+  ComponentSize,
+  IconFont,
+} from 'src/reusable_ui/types'
 
 import {TagFilter, TagFilterType} from 'src/types/annotations'
 
 const nextItem = (xs, x) => xs[(xs.indexOf(x) + 1) % xs.length]
-const TOGGLE_FILTER_DEBOUNCE_DELAY = 500
 
 type DraftState = 'SAVING' | 'EDITING' | 'DEFAULT'
 
 interface Props {
   tagFilter: TagFilter
-  autoFocus?: boolean
   onUpdate: (t: TagFilter) => Promise<void>
   onDelete: (t: TagFilter) => Promise<void>
   onGetKeySuggestions: () => Promise<string[]>
@@ -30,8 +35,6 @@ interface State {
 }
 
 class AnnotationFilterControl extends PureComponent<Props, State> {
-  private debouncer: Debouncer
-
   constructor(props) {
     super(props)
 
@@ -45,12 +48,9 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
       valueSuggestions: [],
       draftState: 'DEFAULT',
     }
-
-    this.debouncer = new Debouncer()
   }
 
   public render() {
-    const {autoFocus} = this.props
     const {
       tagKey,
       tagValue,
@@ -69,15 +69,15 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
             onFocus={this.handleTagKeyFocus}
             onSelect={this.handleSelectTagKey}
             suggestions={keySuggestions}
-            autoFocus={autoFocus}
           />
         </div>
-        <div
-          className="annotation-filter-control--filter-type"
+        <Button
+          text={filterType}
+          color={ComponentColor.Default}
+          status={ComponentStatus.Default}
+          size={ComponentSize.ExtraSmall}
           onClick={this.toggleFilterType}
-        >
-          {filterType}
-        </div>
+        />
         <div className="annotation-filter-control--tag-value">
           <AnnotationFilterControlInput
             value={tagValue}
@@ -86,32 +86,45 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
             onFocus={this.handleTagValueFocus}
             onSelect={this.handleSelectTagValue}
             suggestions={valueSuggestions}
-            autoFocus={false}
           />
         </div>
-        {this.renderIcon()}
+        {this.renderButton()}
       </div>
     )
   }
 
-  public renderIcon() {
+  public renderButton() {
     const {draftState} = this.state
 
+    let status: ComponentStatus = ComponentStatus.Default
+    let color: ComponentColor = ComponentColor.Default
+    let icon: IconFont = IconFont.Trash
+    let onClick = this.handleDelete
+
     if (draftState === 'SAVING') {
-      return <div className="annotation-filter-control--loading" />
+      status = ComponentStatus.Loading
+      color = ComponentColor.Success
     } else if (draftState === 'EDITING') {
-      return (
-        <div className="btn btn-xs btn-default" onClick={this.save}>
-          <span className="icon checkmark" />
-        </div>
-      )
-    } else {
-      return (
-        <div className="btn btn-xs btn-default" onClick={this.handleDelete}>
-          <span className="icon remove" />
-        </div>
-      )
+      icon = IconFont.Checkmark
+      color = ComponentColor.Success
+      onClick = this.save
     }
+
+    if (!this.isValid && draftState !== 'DEFAULT') {
+      status = ComponentStatus.Disabled
+    }
+
+    return (
+      <Button
+        text=""
+        size={ComponentSize.ExtraSmall}
+        shape={ButtonShape.Square}
+        status={status}
+        icon={icon}
+        color={color}
+        onClick={onClick}
+      />
+    )
   }
 
   private handleTagKeyFocus = async (): Promise<void> => {
@@ -145,17 +158,15 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
 
     this.setState({
       filterType: nextItem(FILTER_TYPES, filterType),
-      draftState: 'SAVING',
+      draftState: 'EDITING',
     })
-
-    this.debouncer.call(this.save, TOGGLE_FILTER_DEBOUNCE_DELAY)
   }
 
   private save = async (): Promise<void> => {
     const {onUpdate, onDelete, tagFilter} = this.props
     const {tagKey, filterType, tagValue} = this.state
 
-    if (tagKey === '' || tagValue === '') {
+    if (!this.isValid) {
       return
     }
 
@@ -183,6 +194,12 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
 
   private handleTagValueChange = (tagValue: string) => {
     this.setState({tagValue})
+  }
+
+  private get isValid() {
+    const {tagKey, tagValue} = this.state
+
+    return tagKey !== '' && tagValue !== ''
   }
 }
 

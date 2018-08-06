@@ -42,7 +42,7 @@
 .annotation-filter-control {
   display: flex;
   align-items: center;
-  background-color: $g5-pepper;
+  background-color: $g4-onyx;
   padding: 4px 5px;
   border-radius: 4px;
   text-shadow: none;
@@ -51,55 +51,31 @@
   font-weight: 600;
 
   .annotation-filter-control--tag-key, 
-  .annotation-filter-control--filter-type,
   .annotation-filter-control--tag-value {
     color: $g16-pearl;
-  }
-
-  .annotation-filter-control--tag-key, 
-  .annotation-filter-control--tag-value {
     width: 90px;
     display: flex;
-  }
 
-  .annotation-filter-control--filter-type {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: $form-xs-height - 4px;
-    background-color: $g6-smoke;
-    margin: 0 5px;
-    padding: 0 6px 1px 6px;
-    border-radius: 4px;
-    font-family: $code-font;
-    font-weight: bold;
-    cursor: pointer;
-
-    &:hover {
-      background: $g8-storm;
-      color: $g20-white;
+    .suggestion-input--input {
+      height: 24px;
     }
   }
+  
 
   .suggestion-input--suggestions {
     margin-left: 2px;
     width: calc(100% - 3px);
   }
 
-  .btn-xs {
-    height: $form-xs-height - 4px;
-    width: 20px;
-    margin-left: 3px;
+  button {
+    margin: 0 4px;
+    font-family: $code-font;
+    letter-spacing: -1px;
+  }
 
-    .icon {
-      display: block;
-      padding-top: 3px;
-      margin-left: -4px;
-
-      &.checkmark {
-        color: $c-rainforest;
-      }
-    }
+  button:last-child {
+    margin-right: 0;
+    padding-right: 1px;
   }
 }
 
