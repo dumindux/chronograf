@@ -5,6 +5,7 @@ import {proxy} from 'src/utils/queryUrlGenerator'
 import {getAnnotations} from 'src/shared/apis/annotation'
 import {parseMetaQuery} from 'src/tempVars/parsing'
 import {getTagFilters} from 'src/shared/selectors/annotations'
+import {BLACKLISTED_KEYS} from 'src/shared/annotations/helpers'
 
 import {Annotation, AnnotationRange, TagFilter} from 'src/types/annotations'
 
@@ -281,7 +282,9 @@ export const updateAnnotationAsync = (
 export const fetchAndSetTagKeys = (source: string) => async dispatch => {
   const query = 'SHOW TAG KEYS ON chronograf FROM annotations'
   const resp = await proxy({query, source})
-  const tagKeys = parseMetaQuery(query, resp.data)
+  const tagKeys = parseMetaQuery(query, resp.data).filter(
+    keys => !BLACKLISTED_KEYS.includes(keys)
+  )
 
   dispatch(setTagKeys(tagKeys))
 }

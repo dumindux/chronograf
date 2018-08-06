@@ -51,6 +51,16 @@ export const FILTER_TYPES = [
   TagFilterType.RegNotEquals,
 ]
 
+export const BLACKLISTED_KEYS = [
+  'id',
+  'startTime',
+  'start_time',
+  'endTime',
+  'end_time',
+  'modified_time_ns',
+  'deleted',
+]
+
 export const tagFilterToInfluxQLExp = (t: TagFilter): string => {
   switch (t.filterType) {
     case TagFilterType.Equals:

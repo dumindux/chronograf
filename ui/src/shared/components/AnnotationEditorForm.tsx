@@ -7,6 +7,7 @@ import ConfirmButton from 'src/shared/components/ConfirmButton'
 import AnnotationTagEditorLi from 'src/shared/components/AnnotationTagEditorLi'
 
 import Debouncer from 'src/shared/utils/debouncer'
+import {BLACKLISTED_KEYS} from 'src/shared/annotations/helpers'
 
 import {Annotation} from 'src/types/annotations'
 
@@ -313,12 +314,14 @@ class AnnotationEditorForm extends PureComponent<Props, State> {
     const newTags = [...tags.slice(0, i), newTag, ...tags.slice(i + 1)]
     const uniqueKeys = new Set(newTags.map(t => t.tagKey))
 
-    let nextState
+    const nextState: any = {tags: newTags}
 
-    if (uniqueKeys.size < tags.length) {
-      nextState = {tags: newTags, tagsError: DUPLICATE_KEY_ERROR}
+    if (BLACKLISTED_KEYS.includes(tagKey)) {
+      nextState.tagsError = `“${tagKey}” cannot be used as a tag key`
+    } else if (uniqueKeys.size < tags.length) {
+      nextState.tagsError = DUPLICATE_KEY_ERROR
     } else {
-      nextState = {tags: newTags, tagsError: null}
+      nextState.tagsError = null
     }
 
     this.setState(nextState, this.setDraftAnnotation)
