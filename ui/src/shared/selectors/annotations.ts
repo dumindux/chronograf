@@ -1,6 +1,6 @@
 import {createSelector} from 'reselect'
 
-import {Annotation, TagFilter} from 'src/types/Annotations'
+import {Annotation, TagFilterType} from 'src/types/Annotations'
 import {AnnotationState} from 'src/shared/reducers/annotations'
 
 const getAnnotationsById = (state: {annotations: AnnotationState}) =>
@@ -13,11 +13,27 @@ export const getSelectedAnnotations = createSelector(
   }
 )
 
-export const getTagFilters = (
+const getTagFiltersById = (
   state: {annotations: AnnotationState},
-  dashboardId
-): TagFilter[] => {
-  return Object.values(state.annotations.tagFilters[dashboardId] || {}).filter(
-    v => !!v
-  )
-}
+  dashboardId: number
+) => state.annotations.tagFilters[dashboardId]
+
+export const getTagFilters = createSelector(
+  getTagFiltersById,
+  tagFiltersById => {
+    return Object.values(tagFiltersById || {}).filter(v => !!v)
+  }
+)
+
+export const getTagsFromTagFilters = createSelector(
+  getTagFilters,
+  tagFilters => {
+    return tagFilters.filter(t => t.filterType === TagFilterType.Equals).reduce(
+      (acc, t) => ({
+        ...acc,
+        [t.tagKey]: t.tagValue,
+      }),
+      {}
+    )
+  }
+)

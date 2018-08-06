@@ -12,6 +12,7 @@ import {
   mouseEnterTempAnnotation,
   mouseLeaveTempAnnotation,
 } from 'src/shared/actions/annotations'
+import {getTagsFromTagFilters} from 'src/shared/selectors/annotations'
 
 import {DYGRAPH_CONTAINER_XLABEL_MARGIN} from 'src/shared/constants'
 import {ErrorHandling} from 'src/shared/decorators/errors'
@@ -28,6 +29,9 @@ interface Props {
   onMouseEnterTempAnnotation: () => void
   onMouseLeaveTempAnnotation: () => void
   staticLegendHeight: number
+  annotationTags: {
+    [tagKey: string]: string
+  }
 }
 
 interface State {
@@ -171,6 +175,7 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
       onAddingAnnotationSuccess,
       onMouseLeaveTempAnnotation,
       source,
+      annotationTags,
     } = this.props
     const createUrl = source.links.annotations
 
@@ -181,6 +186,7 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
       ...addingAnnotation,
       startTime,
       endTime,
+      tags: annotationTags,
     }
 
     onSetAddingAnnotation(newAnnotation)
@@ -218,6 +224,16 @@ class NewAnnotation extends Component<Props & WithRouterProps, State> {
   }
 }
 
+const mstp = (state, ownProps) => {
+  const {dashboardID} = ownProps.params
+
+  // The new annotation will be created with tags derived from the current
+  // dashboard's tag filters
+  const annotationTags = getTagsFromTagFilters(state, +dashboardID)
+
+  return {annotationTags}
+}
+
 const mdtp = {
   onAddAnnotationAsync: addAnnotationAsync,
   onSetAddingAnnotation: setAddingAnnotation,
@@ -226,4 +242,4 @@ const mdtp = {
   onMouseLeaveTempAnnotation: mouseLeaveTempAnnotation,
 }
 
-export default withRouter(connect(null, mdtp)(NewAnnotation))
+export default withRouter(connect(mstp, mdtp)(NewAnnotation))
