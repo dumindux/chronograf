@@ -3,6 +3,8 @@ import {Dispatch} from 'redux'
 
 import {getAnnotations} from 'src/shared/apis/annotation'
 
+import {getTagFilters} from 'src/shared/selectors/annotations'
+
 import {Annotation, AnnotationRange, TagFilter} from 'src/types/annotations'
 
 export type Action =
@@ -267,23 +269,16 @@ export const addAnnotationAsync = (
   dispatch(addAnnotation(savedAnnotation))
 }
 
-export type GetAnnotationsDispatcher = (
+export const getAnnotationsAsync = (
   indexUrl: string,
-  annotationRange: AnnotationRange
-) => GetAnnotationsThunk
-
-export type GetAnnotationsThunk = (
-  dispatch: Dispatch<SetAnnotationsAction>
-) => Promise<void>
-
-export const getAnnotationsAsync: GetAnnotationsDispatcher = (
-  indexUrl: string,
-  {since, until}: AnnotationRange
-): GetAnnotationsThunk => async (
-  dispatch: Dispatch<SetAnnotationsAction>
+  {since, until}: AnnotationRange,
+  dashboardId: number
+) => async (
+  dispatch: Dispatch<SetAnnotationsAction>,
+  getState
 ): Promise<void> => {
-  // TODO: Query for annotations based on current tag filters
-  const annotations = await getAnnotations(indexUrl, since, until)
+  const tagFilters = getTagFilters(getState(), dashboardId)
+  const annotations = await getAnnotations(indexUrl, since, until, tagFilters)
 
   dispatch(setAnnotations(annotations))
 }

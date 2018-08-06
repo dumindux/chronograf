@@ -1,5 +1,6 @@
 import AJAX from 'src/utils/ajax'
-import {Annotation} from 'src/types'
+import {Annotation, TagFilter} from 'src/types/annotations'
+import {tagFilterToInfluxQLExp} from 'src/shared/annotations/helpers'
 
 const msToRFCString = (ms: number) =>
   ms && new Date(Math.round(ms)).toISOString()
@@ -36,13 +37,23 @@ export const createAnnotation = async (url: string, annotation: Annotation) => {
 export const getAnnotations = async (
   url: string,
   since: number,
-  until: number
+  until: number | null,
+  tagFilters: TagFilter[]
 ) => {
-  const {data} = await AJAX({
-    method: 'GET',
-    url,
-    params: {since: msToRFCString(since), until: msToRFCString(until)},
-  })
+  let paramedUrl = `${url}?since=${encodeURIComponent(msToRFCString(since))}`
+
+  if (!!until) {
+    paramedUrl += `&until=${encodeURIComponent(msToRFCString(until))}`
+  }
+
+  if (tagFilters.length) {
+    for (const t of tagFilters) {
+      paramedUrl += `&tag=${encodeURIComponent(tagFilterToInfluxQLExp(t))}`
+    }
+  }
+
+  const {data} = await AJAX({method: 'GET', url: paramedUrl})
+
   return data.annotations.map(annoToMillisecond)
 }
 

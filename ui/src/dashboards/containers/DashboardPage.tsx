@@ -151,9 +151,9 @@ class DashboardPage extends Component<Props, State> {
   }
 
   public fetchAnnotations = async () => {
-    const {source, timeRange, getAnnotationsAsync} = this.props
+    const {source, timeRange, getAnnotationsAsync, dashboardID} = this.props
     const rangeMs = millisecondTimeRange(timeRange)
-    await getAnnotationsAsync(source.links.annotations, rangeMs)
+    await getAnnotationsAsync(source.links.annotations, rangeMs, dashboardID)
   }
 
   public componentDidUpdate(prevProps: Props) {
@@ -396,14 +396,14 @@ class DashboardPage extends Component<Props, State> {
     timeRange: QueriesModels.TimeRange
   ): void => {
     const {
-      dashboard,
+      dashboardID,
       getAnnotationsAsync,
       source,
       setDashTimeV1,
       updateQueryParams,
     } = this.props
 
-    setDashTimeV1(dashboard.id, {
+    setDashTimeV1(dashboardID, {
       ...timeRange,
       format: FORMAT_INFLUXQL,
     })
@@ -414,7 +414,7 @@ class DashboardPage extends Component<Props, State> {
     })
 
     const annotationRange = millisecondTimeRange(timeRange)
-    getAnnotationsAsync(source.links.annotations, annotationRange)
+    getAnnotationsAsync(source.links.annotations, annotationRange, dashboardID)
   }
 
   private handleUpdatePosition = (cells: DashboardsModels.Cell[]): void => {

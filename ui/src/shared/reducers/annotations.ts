@@ -5,7 +5,7 @@ import {
 } from 'src/shared/annotations/helpers'
 
 import {Action} from 'src/shared/actions/annotations'
-import {Annotation, TagFilter, TagFilterType} from 'src/types/annotations'
+import {Annotation, TagFilter} from 'src/types/annotations'
 
 export interface AnnotationState {
   annotations: {
@@ -49,16 +49,7 @@ const initialState = {
   },
   tagKeys: null,
   tagValues: {},
-  tagFilters: {
-    1: {
-      a: {
-        id: 'a',
-        tagKey: 'foo',
-        filterType: TagFilterType.Equals,
-        tagValue: 'bar',
-      },
-    },
-  },
+  tagFilters: {},
 }
 
 const annotationsReducer = (

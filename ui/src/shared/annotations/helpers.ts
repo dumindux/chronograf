@@ -50,3 +50,16 @@ export const FILTER_TYPES = [
   TagFilterType.RegEquals,
   TagFilterType.RegNotEquals,
 ]
+
+export const tagFilterToInfluxQLExp = (t: TagFilter): string => {
+  switch (t.filterType) {
+    case TagFilterType.Equals:
+      return `"${t.tagKey}" = '${t.tagValue}'`
+    case TagFilterType.NotEquals:
+      return `"${t.tagKey}" != '${t.tagValue}'`
+    case TagFilterType.RegEquals:
+      return `"${t.tagKey}" =~ /${t.tagValue}/`
+    case TagFilterType.RegNotEquals:
+      return `"${t.tagKey}" !~ /${t.tagValue}/`
+  }
+}
