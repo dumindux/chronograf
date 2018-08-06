@@ -15,7 +15,6 @@ export interface AnnotationState {
   isTempHovering: boolean
   editingAnnotation?: string
   addingAnnotation?: Annotation
-  addingTagFilter?: TagFilter
   tagKeys?: string[]
   tagValues: {
     [tagKey: string]: string[]
@@ -208,13 +207,6 @@ const annotationsReducer = (
             [tagFilter.id]: null,
           },
         },
-      }
-    }
-
-    case 'SET_ADDING_TAG_FILTER': {
-      return {
-        ...state,
-        addingTagFilter: action.payload,
       }
     }
 

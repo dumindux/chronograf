@@ -25,7 +25,6 @@ export type Action =
   | SetEditingAnnotationAction
   | UpdateTagFilterAction
   | DeleteTagFilterAction
-  | SetAddingTagFilterAction
   | SetTagKeysAction
   | SetTagValuesAction
 
@@ -201,18 +200,6 @@ export const deleteTagFilter = (
 ): DeleteTagFilterAction => ({
   type: 'DELETE_TAG_FILTER',
   payload: {dashboardId, tagFilter},
-})
-
-interface SetAddingTagFilterAction {
-  type: 'SET_ADDING_TAG_FILTER'
-  payload: TagFilter
-}
-
-export const setAddingTagFilter = (
-  addingTagFilter: TagFilter
-): SetAddingTagFilterAction => ({
-  type: 'SET_ADDING_TAG_FILTER',
-  payload: addingTagFilter,
 })
 
 interface SetTagKeysAction {

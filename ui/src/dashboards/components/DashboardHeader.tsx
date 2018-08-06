@@ -102,7 +102,7 @@ class DashboardHeader extends Component<Props, State> {
       <>
         <GraphTips />
         {this.addCellButton}
-        {this.toolsButton}
+        {this.toolButtons}
         <AutoRefreshDropdown
           onChoose={handleChooseAutoRefresh}
           onManualRefresh={onManualRefresh}
@@ -152,7 +152,7 @@ class DashboardHeader extends Component<Props, State> {
     }
   }
 
-  private get toolsButton(): JSX.Element {
+  private get toolButtons(): JSX.Element {
     const {
       dashboard,
       showTempVarControls,
