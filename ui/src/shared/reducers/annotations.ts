@@ -180,7 +180,6 @@ const annotationsReducer = (
       }
     }
 
-    case 'CREATE_TAG_FILTER':
     case 'UPDATE_TAG_FILTER': {
       const {tagFilter, dashboardId} = action.payload
       const dashboardTagFilters = state.tagFilters[dashboardId] || {}

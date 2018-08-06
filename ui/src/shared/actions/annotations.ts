@@ -22,7 +22,6 @@ export type Action =
   | DeleteAnnotationAction
   | AddAnnotationAction
   | SetEditingAnnotationAction
-  | CreateTagFilterAction
   | UpdateTagFilterAction
   | DeleteTagFilterAction
   | SetAddingTagFilterAction
@@ -169,25 +168,6 @@ export const setEditingAnnotation = (
 ): SetEditingAnnotationAction => ({
   type: 'SET_EDITING_ANNOTATION',
   payload: id,
-})
-
-interface CreateTagFilterAction {
-  type: 'CREATE_TAG_FILTER'
-  payload: {
-    dashboardId: number
-    tagFilter: TagFilter
-  }
-}
-
-export const createTagFilter = (
-  dashboardId: number,
-  tagFilter: TagFilter
-): CreateTagFilterAction => ({
-  type: 'CREATE_TAG_FILTER',
-  payload: {
-    dashboardId,
-    tagFilter,
-  },
 })
 
 interface UpdateTagFilterAction {

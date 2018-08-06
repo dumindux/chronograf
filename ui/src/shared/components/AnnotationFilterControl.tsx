@@ -155,6 +155,10 @@ class AnnotationFilterControl extends PureComponent<Props, State> {
     const {onUpdate, onDelete, tagFilter} = this.props
     const {tagKey, filterType, tagValue} = this.state
 
+    if (tagKey === '' || tagValue === '') {
+      return
+    }
+
     this.setState({draftState: 'SAVING'})
 
     if (tagKey === '') {
