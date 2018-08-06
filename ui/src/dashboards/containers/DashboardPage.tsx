@@ -318,6 +318,7 @@ class DashboardPage extends Component<Props, State> {
           showAnnotationControls && (
             <AnnotationControlBar
               dashboardId={dashboardID}
+              source={source}
               onRefreshAnnotations={this.fetchAnnotations}
             />
           )}

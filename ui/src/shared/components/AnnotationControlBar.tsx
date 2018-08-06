@@ -15,6 +15,7 @@ import {
 
 import {getTagFilters} from 'src/shared/selectors/annotations'
 
+import {Source} from 'src/types'
 import {TagFilter} from 'src/types/annotations'
 import {AnnotationState} from 'src/shared/reducers/annotations'
 
@@ -25,6 +26,7 @@ interface Props {
   tagValues: {
     [tagKey: string]: string[]
   }
+  source: Source
   onCreateTagFilter: typeof createTagFilter
   onUpdateTagFilter: typeof updateTagFilter
   onDeleteTagFilter: typeof deleteTagFilter
@@ -86,13 +88,13 @@ class AnnotationControlBar extends PureComponent<Props> {
   }
 
   private handleGetKeySuggestions = async (): Promise<string[]> => {
-    const {tagKeys, onGetTagKeys} = this.props
+    const {tagKeys, onGetTagKeys, source} = this.props
 
     if (!!tagKeys) {
       return tagKeys
     }
 
-    await onGetTagKeys()
+    await onGetTagKeys(source.links.proxy)
 
     return this.props.tagKeys
   }
@@ -100,13 +102,13 @@ class AnnotationControlBar extends PureComponent<Props> {
   private handleGetValueSuggestions = async (
     tagKey: string
   ): Promise<string[]> => {
-    const {tagValues, onGetTagValues} = this.props
+    const {tagValues, onGetTagValues, source} = this.props
 
     if (!!tagValues[tagKey]) {
       return tagValues[tagKey]
     }
 
-    await onGetTagValues(tagKey)
+    await onGetTagValues(source.links.proxy, tagKey)
 
     return this.props.tagValues[tagKey]
   }

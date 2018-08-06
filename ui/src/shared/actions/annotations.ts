@@ -1,8 +1,9 @@
 import * as api from 'src/shared/apis/annotation'
 import {Dispatch} from 'redux'
 
+import {proxy} from 'src/utils/queryUrlGenerator'
 import {getAnnotations} from 'src/shared/apis/annotation'
-
+import {parseMetaQuery} from 'src/tempVars/parsing'
 import {getTagFilters} from 'src/shared/selectors/annotations'
 
 import {Annotation, AnnotationRange, TagFilter} from 'src/types/annotations'
@@ -297,22 +298,21 @@ export const updateAnnotationAsync = (
   dispatch(updateAnnotation(annotation))
 }
 
-export const fetchAndSetTagKeys = () => async dispatch => {
-  // TODO: SHOW TAG KEYS ON chronograf FROM annotations
-  const tagKeys = await Promise.resolve(['dumpling', 'veggie', 'cereal'])
+export const fetchAndSetTagKeys = (source: string) => async dispatch => {
+  const query = 'SHOW TAG KEYS ON chronograf FROM annotations'
+  const resp = await proxy({query, source})
+  const tagKeys = parseMetaQuery(query, resp.data)
 
   dispatch(setTagKeys(tagKeys))
 }
 
-export const fetchAndSetTagValues = (tagKey: string) => async dispatch => {
-  // TODO: SHOW TAG VALUES ON chronograf FROM annotations WITH KEY tagKey
-  const tagValues = await Promise.resolve([
-    'empanada',
-    'gyoza',
-    'mandu',
-    'pierogi',
-    'samosa',
-  ])
+export const fetchAndSetTagValues = (
+  source: string,
+  tagKey: string
+) => async dispatch => {
+  const query = `SHOW TAG VALUES ON chronograf FROM annotations WITH KEY = "${tagKey}"`
+  const resp = await proxy({query, source})
+  const tagValues = parseMetaQuery(query, resp.data)
 
   dispatch(setTagValues(tagKey, tagValues))
 }
